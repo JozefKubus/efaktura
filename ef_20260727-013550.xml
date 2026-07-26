@@ -1,0 +1,283 @@
+<export>
+  <xs:schema id="export" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="export" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="QVDASHBOARD">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MANDANT" type="xs:string" minOccurs="0" />
+                <xs:element name="QVDASHBOARD" type="xs:string" minOccurs="0" />
+                <xs:element name="TITLE" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="AUTOREFRESHINTERVAL" type="xs:int" minOccurs="0" />
+                <xs:element name="OPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="FLIPSUCCESSOR" type="xs:string" minOccurs="0" />
+                <xs:element name="FLIPURL" type="xs:string" minOccurs="0" />
+                <xs:element name="FLIPURLAPPENDPARAMS" type="xs:short" minOccurs="0" />
+                <xs:element name="CSSSTYLE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAVVIEWPAGE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAVVIEWOPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="JSPAGESCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="INFO" type="xs:string" minOccurs="0" />
+                <xs:element name="GUID" type="xs:string" minOccurs="0" />
+                <xs:element name="APWAYPATH" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="QVQUERY">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MANDANT" type="xs:string" minOccurs="0" />
+                <xs:element name="QVQUERY" type="xs:string" minOccurs="0" />
+                <xs:element name="TITLE" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="STATEMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="OPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="STATUS" type="xs:short" minOccurs="0" />
+                <xs:element name="JSPAGESCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="CSSSTYLE" type="xs:string" minOccurs="0" />
+                <xs:element name="TRANSLATEHEADER" type="xs:short" minOccurs="0" />
+                <xs:element name="SCRIPTONLY" type="xs:short" minOccurs="0" />
+                <xs:element name="VERSION" type="xs:int" minOccurs="0" />
+                <xs:element name="INFO" type="xs:string" minOccurs="0" />
+                <xs:element name="GUID" type="xs:string" minOccurs="0" />
+                <xs:element name="CACHEDURATION" type="xs:int" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="QVDASHBOARDQUERY">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MANDANT" type="xs:string" minOccurs="0" />
+                <xs:element name="QVDASHBOARD" type="xs:string" minOccurs="0" />
+                <xs:element name="QVQUERY" type="xs:string" minOccurs="0" />
+                <xs:element name="TITLE" type="xs:string" minOccurs="0" />
+                <xs:element name="PACKAGEONLY" type="xs:short" minOccurs="0" />
+                <xs:element name="COMPUTEEXPRESSION" type="xs:string" minOccurs="0" />
+                <xs:element name="ORDERPOSITION" type="xs:short" minOccurs="0" />
+                <xs:element name="COMPUTEUNIT" type="xs:string" minOccurs="0" />
+                <xs:element name="AUTOOPEN" type="xs:short" minOccurs="0" />
+                <xs:element name="OPENFORBIDDEN" type="xs:short" minOccurs="0" />
+                <xs:element name="HIDETITLE" type="xs:short" minOccurs="0" />
+                <xs:element name="HIDECOMPUTE" type="xs:short" minOccurs="0" />
+                <xs:element name="HIDECOMPUTEZERO" type="xs:short" minOccurs="0" />
+                <xs:element name="SHOWEXPORT" type="xs:short" minOccurs="0" />
+                <xs:element name="SHOWPRINT" type="xs:short" minOccurs="0" />
+                <xs:element name="FORCEDISPLAYTABLE" type="xs:short" minOccurs="0" />
+                <xs:element name="ELEMENTHEIGHT" type="xs:short" minOccurs="0" />
+                <xs:element name="ELEMENTWIDTH" type="xs:short" minOccurs="0" />
+                <xs:element name="PARAMSTRING" type="xs:string" minOccurs="0" />
+                <xs:element name="JSCOMPUTESCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="JSCHARTSCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="CHARTOPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="INFO" type="xs:string" minOccurs="0" />
+                <xs:element name="GUID" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <QVDASHBOARD>
+    <MANDANT>FERNO</MANDANT>
+    <QVDASHBOARD>ef</QVDASHBOARD>
+    <TITLE>ef</TITLE>
+    <JSPAGESCRIPT>window.efXmlTextContent = null;
+window.efSeftTextContent = null;
+window.efSaxonTextContent = null;
+window.efInvoiceId = "Neznáme";
+
+function skontrolujStav() {
+    if (window.efXmlTextContent &amp;&amp; window.efSeftTextContent &amp;&amp; window.efSaxonTextContent) {
+        $("#btnPreview").prop("disabled", false);
+        $("#btnSaveDb").prop("disabled", false);
+    }
+}
+
+// 1. Výber SaxonJS knižnice z disku
+function vybratSaxon() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".js,.rt";
+    fileInput.onchange = (e) =&gt; {
+        const file = e.target.files[0];
+        if (!file) return;
+        $("#saxon-info").text("SaxonJS: " + file.name);
+        const reader = new FileReader();
+        reader.onload = (event) =&gt; {
+            window.efSaxonTextContent = event.target.result;
+            // Injektujeme kód do stránky
+            const scriptEl = document.createElement("script");
+            scriptEl.textContent = window.efSaxonTextContent;
+            document.head.appendChild(scriptEl);
+            skontrolujStav();
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
+// 2. Výber SEF šablóny
+function vybratSEF() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".sef,.json";
+    fileInput.onchange = (e) =&gt; {
+        const file = e.target.files[0];
+        if (!file) return;
+        $("#sef-info").text("Šablóna: " + file.name);
+        const reader = new FileReader();
+        reader.onload = (event) =&gt; {
+            window.efSeftTextContent = event.target.result;
+            skontrolujStav();
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
+// 3. Výber XML faktúry
+function vybratXML() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".xml";
+    fileInput.onchange = (e) =&gt; {
+        const file = e.target.files[0];
+        if (!file) return;
+        $("#file-info").text("Faktúra: " + file.name);
+        const reader = new FileReader();
+        reader.onload = (event) =&gt; {
+            window.efXmlTextContent = event.target.result;
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(window.efXmlTextContent, "application/xml");
+                if (xmlDoc.getElementsByTagName("parsererror").length &gt; 0) throw new Error("Nevalidné XML");
+                
+                const idNode = xmlDoc.getElementsByTagNameNS("*", "ID")[0];
+                window.efInvoiceId = idNode ? idNode.textContent : "Neznáme";
+                skontrolujStav();
+            } catch (err) {
+                alert("Chyba pri parsovaní XML.");
+                window.efXmlTextContent = null;
+                $("#btnPreview, #btnSaveDb").prop("disabled", true);
+            }
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
+// 4. Zobrazenie náhľadu
+async function zobrazitNahlad() {
+    if (!window.efXmlTextContent || !window.efSeftTextContent || typeof SaxonJS === "undefined") {
+        alert("Musíte vybrať SaxonJS, SEF šablónu aj XML faktúru.");
+        return;
+    }
+
+    try {
+        const sefObjekt = JSON.parse(window.efSeftTextContent);
+
+        const result = await SaxonJS.transform({
+            stylesheetInternal: sefObjekt,
+            sourceText: window.efXmlTextContent,
+            destination: "serialized"
+        }, "async");
+
+        let resultHtml = "";
+        if (result.principalResult) {
+            resultHtml = result.principalResult;
+        } else if (typeof result === "string") {
+            resultHtml = result;
+        }
+
+        const previewFrame = document.getElementById("preview-window");
+        if (previewFrame &amp;&amp; previewFrame.contentWindow) {
+            const frameDoc = previewFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(resultHtml);
+            frameDoc.close();
+        }
+
+    } catch (e) {
+        console.error("Chyba SaxonJS transformácie:", e);
+        alert("Chyba pri spracovaní šablóny: " + e.message);
+    }
+}
+
+async function ulozitDoSQL() {
+    if (!window.efXmlTextContent) return;
+    alert("Faktúra " + window.efInvoiceId + " pripravená na zápis do DB.");
+}</JSPAGESCRIPT>
+    <INFO>&lt;p&gt;// Globálne premenné&lt;br&gt;window.efXmlTextContent = null;&lt;br&gt;window.efXsltTextContent = null;&lt;br&gt;window.efInvoiceId = "Neznáme";&lt;/p&gt;&lt;p&gt;// Pomocná funkcia na odomknutie tlačidiel&lt;br&gt;function skontrolujStav() {&lt;br&gt;&amp;nbsp; &amp;nbsp;// Náhľad povolíme, ak máme XML aj XSLT&lt;br&gt;&amp;nbsp; &amp;nbsp;if (window.efXmlTextContent &amp;amp;&amp;amp; window.efXsltTextContent) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#btnPreview").prop("disabled", false);&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;&amp;nbsp; &amp;nbsp;// Uloženie do DB povolíme, ak máme aspoň XML&lt;br&gt;&amp;nbsp; &amp;nbsp;if (window.efXmlTextContent) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#btnSaveDb").prop("disabled", false);&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function vybratXSLT() {&lt;br&gt;&amp;nbsp; &amp;nbsp;const fileInput = document.createElement("input");&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.type = "file";&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.accept = ".xslt,.xsl,.xml"; // XSLT súbory majú často rôzne prípony&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;fileInput.onchange = (e) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const file = e.target.files[0];&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (!file) return;&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#xslt-info").text("Šablóna: " + file.name);&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const reader = new FileReader();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.onload = (event) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efXsltTextContent = event.target.result;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;skontrolujStav();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.readAsText(file);&lt;br&gt;&amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.click();&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function vybratXML() {&lt;br&gt;&amp;nbsp; &amp;nbsp;const fileInput = document.createElement("input");&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.type = "file";&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.accept = ".xml";&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;fileInput.onchange = (e) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const file = e.target.files[0];&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (!file) return;&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#file-info").text("Faktúra: " + file.name);&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const reader = new FileReader();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.onload = (event) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efXmlTextContent = event.target.result;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;try {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const parser = new DOMParser();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xmlDoc = parser.parseFromString(window.efXmlTextContent, "application/xml");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (xmlDoc.getElementsByTagName("parsererror").length &amp;gt; 0) throw new Error("Nevalidné XML");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const idNode = xmlDoc.getElementsByTagNameNS("*", "ID")[0];&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efInvoiceId = idNode ? idNode.textContent : "Neznáme";&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;skontrolujStav();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;} catch (err) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;alert("Chyba pri parsovaní XML.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efXmlTextContent = null;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#btnPreview, #btnSaveDb").prop("disabled", true);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.readAsText(file);&lt;br&gt;&amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.click();&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function zobrazitNahlad() {&lt;br&gt;&amp;nbsp; &amp;nbsp;if (!window.efXmlTextContent || !window.efXsltTextContent) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;alert("Najprv musíte načítať XML súbor aj XSLT šablónu.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;return;&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;try {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const parser = new DOMParser();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Parsovanie XSLT z pamäte&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xsltDoc = parser.parseFromString(window.efXsltTextContent, "application/xml");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (xsltDoc.getElementsByTagName("parsererror").length &amp;gt; 0) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;throw new Error("XSLT šablóna obsahuje syntaktickú chybu.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Parsovanie faktúry (XML) z pamäte&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xmlDoc = parser.parseFromString(window.efXmlTextContent, "application/xml");&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Spustenie transformácie (zabudovaný objekt v prehliadači)&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xsltProcessor = new XSLTProcessor();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;xsltProcessor.importStylesheet(xsltDoc);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const resultDoc = xsltProcessor.transformToDocument(xmlDoc);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (!resultDoc) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;throw new Error("Transformácia zlyhala. Je možné, že XSLT šablóna nie je kompatibilná so vstavaným XSLT 1.0 procesorom.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Zápis vygenerovaného HTML do okna&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const serializer = new XMLSerializer();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const resultHtml = serializer.serializeToString(resultDoc);&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const previewFrame = document.getElementById("preview-window");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;previewFrame.contentWindow.document.open();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;previewFrame.contentWindow.document.write(resultHtml);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;previewFrame.contentWindow.document.close();&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;} catch (e) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;console.error("Chyba pri transformácii:", e);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;alert("Chyba: " + e.message);&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function ulozitDoSQL() {&lt;br&gt;&amp;nbsp; &amp;nbsp;if (!window.efXmlTextContent) return;&lt;br&gt;&amp;nbsp; &amp;nbsp;alert("Faktúra " + window.efInvoiceId + " pripravená na zápis.");&lt;br&gt;}&lt;/p&gt;&lt;p&gt;SaxonJS.transform({&lt;br&gt;&amp;nbsp; &amp;nbsp;sef: "cesta_k_vasmu_suboru.sef.json", // alebo priamo JSON objekt&lt;br&gt;&amp;nbsp; &amp;nbsp;sourceText: "&amp;lt;xml&amp;gt;...&amp;lt;/xml&amp;gt;", &amp;nbsp; &amp;nbsp; &amp;nbsp; // XML dáta na vstup&lt;br&gt;&amp;nbsp; &amp;nbsp;stylesheetParams: {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;"parametrName": "hodnota"&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;}, "async");&lt;/p&gt;</INFO>
+    <GUID>66B2EB00-7F30-4AB6-A8DF-DB0C296F852B</GUID>
+  </QVDASHBOARD>
+  <QVQUERY>
+    <MANDANT>FERNO</MANDANT>
+    <QVQUERY>ef</QVQUERY>
+    <TITLE>ef</TITLE>
+    <STATEMENT>SELECT 
+'&lt;div class="efaktura-wrapper"&gt;
+    &lt;div id="sidebar"&gt;
+      &lt;h3&gt;Akcie&lt;/h3&gt;
+      &lt;button id="btnSelectSaxon" onclick="vybratSaxon()"&gt;1. Vybrať SaxonJS.rt&lt;/button&gt;
+      &lt;div id="saxon-info" style="font-size: 12px; margin-bottom: 15px; color: #555;"&gt;&lt;/div&gt;
+
+      &lt;button id="btnSelectSef" onclick="vybratSEF()"&gt;2. Vybrať SEF šablónu&lt;/button&gt;
+      &lt;div id="sef-info" style="font-size: 12px; margin-bottom: 15px; color: #555;"&gt;&lt;/div&gt;
+
+      &lt;button id="btnSelectXml" onclick="vybratXML()"&gt;3. Vybrať XML faktúru&lt;/button&gt;
+      &lt;div id="file-info" style="font-size: 12px; margin-bottom: 15px; color: #555;"&gt;&lt;/div&gt;
+
+      &lt;button id="btnPreview" onclick="zobrazitNahlad()" disabled="disabled"&gt;4. Zobraziť náhľad&lt;/button&gt;
+      &lt;button id="btnSaveDb" onclick="ulozitDoSQL()" disabled="disabled"&gt;5. Uložiť do MS SQL&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div id="main-content"&gt;
+      &lt;h3&gt;Náhľad&lt;/h3&gt;
+      &lt;iframe id="preview-window"&gt;&lt;/iframe&gt;
+    &lt;/div&gt;
+&lt;/div&gt;' AS [Aplikacia]</STATEMENT>
+    <OPTIONS>&lt;config&gt;&lt;column name="Aplikacia"&gt;&lt;html /&gt;&lt;/column&gt;&lt;/config&gt;</OPTIONS>
+    <CSSSTYLE>.efaktura-wrapper { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    display: flex; 
+    height: 100%;
+    min-height: 600px;
+}
+#sidebar { 
+    width: 250px; 
+    padding: 20px; 
+    background: #eee; 
+}
+#sidebar button { 
+    padding: 10px; 
+    width: 100%; 
+    margin-bottom: 10px; 
+    cursor: pointer; 
+}
+#main-content { 
+    flex: 1; 
+    padding: 20px; 
+    overflow-y: auto; 
+}
+#preview-window { 
+    border: 1px solid #999; 
+    height: 80vh; 
+    width: 100%; 
+    background: white; 
+}</CSSSTYLE>
+    <INFO>&lt;p&gt;SELECT&amp;nbsp;&lt;br&gt;'&amp;lt;div class="efaktura-wrapper"&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;lt;div id="sidebar"&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;h3&amp;gt;Akcie&amp;lt;/h3&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;button id="btnSelectXml"&amp;gt;1. Vybrať XML súbor&amp;lt;/button&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;button id="btnPreview" disabled="disabled"&amp;gt;2. Zobraziť náhľad (XSLT)&amp;lt;/button&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;button id="btnSaveDb" disabled="disabled"&amp;gt;3. Uložiť do MS SQL&amp;lt;/button&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;div id="file-info"&amp;gt;&amp;lt;/div&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;lt;/div&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;lt;div id="main-content"&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;h3&amp;gt;Náhľad&amp;lt;/h3&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;lt;iframe id="preview-window"&amp;gt;&amp;lt;/iframe&amp;gt;&lt;br&gt;&amp;nbsp; &amp;nbsp;&amp;lt;/div&amp;gt;&lt;br&gt;&amp;lt;/div&amp;gt;' AS [Aplikacia]&lt;/p&gt;</INFO>
+    <GUID>A4DC21CB-F31C-44CD-BE22-E3DAF3F2E943</GUID>
+  </QVQUERY>
+  <QVDASHBOARDQUERY>
+    <MANDANT>FERNO</MANDANT>
+    <QVDASHBOARD>ef</QVDASHBOARD>
+    <QVQUERY>ef</QVQUERY>
+    <AUTOOPEN>1</AUTOOPEN>
+    <SHOWEXPORT>1</SHOWEXPORT>
+    <SHOWPRINT>1</SHOWPRINT>
+    <ELEMENTWIDTH>1500</ELEMENTWIDTH>
+    <GUID>EE257E49-A503-4CB4-8FF3-DE3540FCF73E</GUID>
+  </QVDASHBOARDQUERY>
+</export>
