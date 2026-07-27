@@ -1,0 +1,488 @@
+<export>
+  <xs:schema id="export" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="export" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="QVDASHBOARD">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MANDANT" type="xs:string" minOccurs="0" />
+                <xs:element name="QVDASHBOARD" type="xs:string" minOccurs="0" />
+                <xs:element name="TITLE" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="AUTOREFRESHINTERVAL" type="xs:int" minOccurs="0" />
+                <xs:element name="OPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="FLIPSUCCESSOR" type="xs:string" minOccurs="0" />
+                <xs:element name="FLIPURL" type="xs:string" minOccurs="0" />
+                <xs:element name="FLIPURLAPPENDPARAMS" type="xs:short" minOccurs="0" />
+                <xs:element name="CSSSTYLE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAVVIEWPAGE" type="xs:string" minOccurs="0" />
+                <xs:element name="NAVVIEWOPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="JSPAGESCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="INFO" type="xs:string" minOccurs="0" />
+                <xs:element name="GUID" type="xs:string" minOccurs="0" />
+                <xs:element name="APWAYPATH" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="QVQUERY">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MANDANT" type="xs:string" minOccurs="0" />
+                <xs:element name="QVQUERY" type="xs:string" minOccurs="0" />
+                <xs:element name="TITLE" type="xs:string" minOccurs="0" />
+                <xs:element name="DESCRIPTION" type="xs:string" minOccurs="0" />
+                <xs:element name="STATEMENT" type="xs:string" minOccurs="0" />
+                <xs:element name="OPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="STATUS" type="xs:short" minOccurs="0" />
+                <xs:element name="JSPAGESCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="CSSSTYLE" type="xs:string" minOccurs="0" />
+                <xs:element name="TRANSLATEHEADER" type="xs:short" minOccurs="0" />
+                <xs:element name="SCRIPTONLY" type="xs:short" minOccurs="0" />
+                <xs:element name="VERSION" type="xs:int" minOccurs="0" />
+                <xs:element name="INFO" type="xs:string" minOccurs="0" />
+                <xs:element name="GUID" type="xs:string" minOccurs="0" />
+                <xs:element name="CACHEDURATION" type="xs:int" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="QVDASHBOARDQUERY">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MANDANT" type="xs:string" minOccurs="0" />
+                <xs:element name="QVDASHBOARD" type="xs:string" minOccurs="0" />
+                <xs:element name="QVQUERY" type="xs:string" minOccurs="0" />
+                <xs:element name="TITLE" type="xs:string" minOccurs="0" />
+                <xs:element name="PACKAGEONLY" type="xs:short" minOccurs="0" />
+                <xs:element name="COMPUTEEXPRESSION" type="xs:string" minOccurs="0" />
+                <xs:element name="ORDERPOSITION" type="xs:short" minOccurs="0" />
+                <xs:element name="COMPUTEUNIT" type="xs:string" minOccurs="0" />
+                <xs:element name="AUTOOPEN" type="xs:short" minOccurs="0" />
+                <xs:element name="OPENFORBIDDEN" type="xs:short" minOccurs="0" />
+                <xs:element name="HIDETITLE" type="xs:short" minOccurs="0" />
+                <xs:element name="HIDECOMPUTE" type="xs:short" minOccurs="0" />
+                <xs:element name="HIDECOMPUTEZERO" type="xs:short" minOccurs="0" />
+                <xs:element name="SHOWEXPORT" type="xs:short" minOccurs="0" />
+                <xs:element name="SHOWPRINT" type="xs:short" minOccurs="0" />
+                <xs:element name="FORCEDISPLAYTABLE" type="xs:short" minOccurs="0" />
+                <xs:element name="ELEMENTHEIGHT" type="xs:short" minOccurs="0" />
+                <xs:element name="ELEMENTWIDTH" type="xs:short" minOccurs="0" />
+                <xs:element name="PARAMSTRING" type="xs:string" minOccurs="0" />
+                <xs:element name="JSCOMPUTESCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="JSCHARTSCRIPT" type="xs:string" minOccurs="0" />
+                <xs:element name="CHARTOPTIONS" type="xs:string" minOccurs="0" />
+                <xs:element name="INFO" type="xs:string" minOccurs="0" />
+                <xs:element name="GUID" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <QVDASHBOARD>
+    <MANDANT>FERNO</MANDANT>
+    <QVDASHBOARD>ef_2</QVDASHBOARD>
+    <TITLE>ef</TITLE>
+    <CSSSTYLE>/* Celkový obal aplikácie – roztiahne sa na 100% výšky okna */
+.efaktura-wrapper {
+    display: flex;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    height: calc(100vh - 120px); /* Prispôsobí sa výške obrazovky mínus horná lišta APplus */
+    min-height: 600px;
+    background-color: #f4f6f9;
+    padding: 15px;
+    box-sizing: border-box;
+    gap: 20px;
+}
+
+/* Bočný panel pre ovládanie */
+#sidebar {
+    width: 280px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+#sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 15px;
+    color: #333;
+    border-bottom: 2px solid #eaeaea;
+    padding-bottom: 8px;
+}
+
+/* Tlačidlá */
+#sidebar button {
+    padding: 10px 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#sidebar button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+#sidebar button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+#sidebar button:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Špeciálne tlačidlo na vymazanie */
+#sidebar button#btnClear {
+    background-color: #fff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    text-align: center;
+    margin-top: 5px;
+}
+
+#sidebar button#btnClear:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Hlavná časť s náhľadom */
+#main-content {
+    flex-grow: 1;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%; /* Zabezpečí plnú výšku kontajnera */
+}
+
+#main-content h3 {
+    margin: 0;
+    padding: 15px 20px;
+    font-size: 15px;
+    color: #333;
+    background: #fafbfc;
+    border-bottom: 1px solid #eaeaea;
+    flex-shrink: 0;
+}
+
+/* Iframe pre samotný HTML náhľad faktúry – dynamicky vyplní zvyšok */
+#preview-window {
+    width: 100%;
+    flex-grow: 1; /* Automaticky roztiahne iframe na celú zostávajúcu výšku */
+    border: none;
+    background: #ffffff;
+}</CSSSTYLE>
+    <JSPAGESCRIPT>window.efXmlTextContent = null;
+window.efSeftTextContent = null;
+window.efInvoiceId = "Neznáme";
+
+// Kontrola, či môžeme povoliť náhľad
+function skontrolujStav() {
+    if (window.efXmlTextContent &amp;&amp; window.efSeftTextContent &amp;&amp; typeof SaxonJS !== "undefined") {
+        $("#btnPreview").prop("disabled", false);
+        $("#btnSaveDb").prop("disabled", false);
+    }
+}
+
+// 1. Výber SaxonJS knižnice
+function vybratSaxon() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".js,.rt";
+    fileInput.onchange = (e) =&gt; {
+        const file = e.target.files[0];
+        if (!file) return;
+        $("#saxon-info").text("SaxonJS: " + file.name);
+        const reader = new FileReader();
+        reader.onload = (event) =&gt; {
+            const scriptEl = document.createElement("script");
+            scriptEl.textContent = event.target.result;
+            document.head.appendChild(scriptEl);
+            skontrolujStav();
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
+// 2. Výber SEF šablóny
+function vybratSEF() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".sef,.json";
+    fileInput.onchange = (e) =&gt; {
+        const file = e.target.files[0];
+        if (!file) return;
+        $("#sef-info").text("Šablóna: " + file.name);
+        const reader = new FileReader();
+        reader.onload = (event) =&gt; {
+            try {
+                window.efSeftTextContent = JSON.parse(event.target.result);
+                skontrolujStav();
+            } catch (err) {
+                alert("Chyba: Zvolený súbor nie je platný JSON/SEF formát.");
+            }
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
+// 3. Výber XML faktúry
+function vybratXML() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".xml";
+    fileInput.onchange = (e) =&gt; {
+        const file = e.target.files[0];
+        if (!file) return;
+        $("#file-info").text("Faktúra: " + file.name);
+        const reader = new FileReader();
+        reader.onload = (event) =&gt; {
+            window.efXmlTextContent = event.target.result;
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(window.efXmlTextContent, "application/xml");
+                if (xmlDoc.getElementsByTagName("parsererror").length &gt; 0) throw new Error("Nevalidné XML");
+                
+                const idNode = xmlDoc.getElementsByTagNameNS("*", "ID")[0];
+                window.efInvoiceId = idNode ? idNode.textContent : "Neznáme";
+                skontrolujStav();
+            } catch (err) {
+                alert("Chyba pri parsovaní XML.");
+                window.efXmlTextContent = null;
+                $("#btnPreview, #btnSaveDb").prop("disabled", true);
+            }
+        };
+        reader.readAsText(file);
+    };
+    fileInput.click();
+}
+
+// 4. Zobrazenie náhľadu
+async function zobrazitNahlad() {
+    if (!window.efXmlTextContent || !window.efSeftTextContent || typeof SaxonJS === "undefined") {
+        alert("Nie sú vybrané všetky potrebné súbory (SaxonJS, SEF šablóna aj XML faktúra).");
+        return;
+    }
+
+    try {
+        const result = await SaxonJS.transform({
+            stylesheetInternal: window.efSeftTextContent,
+            sourceText: window.efXmlTextContent,
+            destination: "serialized"
+        }, "async");
+
+        let resultHtml = "";
+        if (result.principalResult) {
+            resultHtml = result.principalResult;
+        } else if (typeof result === "string") {
+            resultHtml = result;
+        }
+
+        const previewFrame = document.getElementById("preview-window");
+        if (previewFrame &amp;&amp; previewFrame.contentWindow) {
+            const frameDoc = previewFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(resultHtml);
+            frameDoc.close();
+        }
+
+    } catch (e) {
+        console.error("Chyba SaxonJS transformácie:", e);
+        alert("Chyba pri spracovaní šablóny: " + e.message);
+    }
+}
+
+// 5. Vymazanie náhľadu a reset dát
+// 5. Vymazanie náhľadu a reset iba XML faktúry (SEF šablóna zostáva zachovaná)
+function vymazatNahlad() {
+    window.efXmlTextContent = null;
+    window.efInvoiceId = "Neznáme";
+    
+    // Vyčistenie textu iba pre faktúru
+    $("#file-info").text("");
+    
+    // Zablokovanie tlačidiel náhľadu a ukladania (kým sa nevyberie nová faktúra)
+    $("#btnPreview, #btnSaveDb").prop("disabled", true);
+
+    // Vyčistenie obsahu iframe okna
+    const previewFrame = document.getElementById("preview-window");
+    if (previewFrame &amp;&amp; previewFrame.contentWindow) {
+        const frameDoc = previewFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write("");
+        frameDoc.close();
+    }
+}
+
+async function ulozitDoSQL() {
+    if (!window.efXmlTextContent) return;
+    alert("Faktúra " + window.efInvoiceId + " pripravená na zápis do DB.");
+}</JSPAGESCRIPT>
+    <INFO>&lt;p&gt;// Globálne premenné&lt;br&gt;window.efXmlTextContent = null;&lt;br&gt;window.efXsltTextContent = null;&lt;br&gt;window.efInvoiceId = "Neznáme";&lt;/p&gt;&lt;p&gt;// Pomocná funkcia na odomknutie tlačidiel&lt;br&gt;function skontrolujStav() {&lt;br&gt;&amp;nbsp; &amp;nbsp;// Náhľad povolíme, ak máme XML aj XSLT&lt;br&gt;&amp;nbsp; &amp;nbsp;if (window.efXmlTextContent &amp;amp;&amp;amp; window.efXsltTextContent) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#btnPreview").prop("disabled", false);&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;&amp;nbsp; &amp;nbsp;// Uloženie do DB povolíme, ak máme aspoň XML&lt;br&gt;&amp;nbsp; &amp;nbsp;if (window.efXmlTextContent) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#btnSaveDb").prop("disabled", false);&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function vybratXSLT() {&lt;br&gt;&amp;nbsp; &amp;nbsp;const fileInput = document.createElement("input");&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.type = "file";&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.accept = ".xslt,.xsl,.xml"; // XSLT súbory majú často rôzne prípony&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;fileInput.onchange = (e) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const file = e.target.files[0];&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (!file) return;&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#xslt-info").text("Šablóna: " + file.name);&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const reader = new FileReader();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.onload = (event) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efXsltTextContent = event.target.result;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;skontrolujStav();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.readAsText(file);&lt;br&gt;&amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.click();&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function vybratXML() {&lt;br&gt;&amp;nbsp; &amp;nbsp;const fileInput = document.createElement("input");&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.type = "file";&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.accept = ".xml";&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;fileInput.onchange = (e) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const file = e.target.files[0];&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (!file) return;&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#file-info").text("Faktúra: " + file.name);&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const reader = new FileReader();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.onload = (event) =&amp;gt; {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efXmlTextContent = event.target.result;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;try {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const parser = new DOMParser();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xmlDoc = parser.parseFromString(window.efXmlTextContent, "application/xml");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (xmlDoc.getElementsByTagName("parsererror").length &amp;gt; 0) throw new Error("Nevalidné XML");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const idNode = xmlDoc.getElementsByTagNameNS("*", "ID")[0];&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efInvoiceId = idNode ? idNode.textContent : "Neznáme";&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;skontrolujStav();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;} catch (err) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;alert("Chyba pri parsovaní XML.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;window.efXmlTextContent = null;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;$("#btnPreview, #btnSaveDb").prop("disabled", true);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;reader.readAsText(file);&lt;br&gt;&amp;nbsp; &amp;nbsp;};&lt;br&gt;&amp;nbsp; &amp;nbsp;fileInput.click();&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function zobrazitNahlad() {&lt;br&gt;&amp;nbsp; &amp;nbsp;if (!window.efXmlTextContent || !window.efXsltTextContent) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;alert("Najprv musíte načítať XML súbor aj XSLT šablónu.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;return;&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;try {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const parser = new DOMParser();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Parsovanie XSLT z pamäte&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xsltDoc = parser.parseFromString(window.efXsltTextContent, "application/xml");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (xsltDoc.getElementsByTagName("parsererror").length &amp;gt; 0) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;throw new Error("XSLT šablóna obsahuje syntaktickú chybu.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Parsovanie faktúry (XML) z pamäte&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xmlDoc = parser.parseFromString(window.efXmlTextContent, "application/xml");&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Spustenie transformácie (zabudovaný objekt v prehliadači)&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const xsltProcessor = new XSLTProcessor();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;xsltProcessor.importStylesheet(xsltDoc);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const resultDoc = xsltProcessor.transformToDocument(xmlDoc);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;if (!resultDoc) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;throw new Error("Transformácia zlyhala. Je možné, že XSLT šablóna nie je kompatibilná so vstavaným XSLT 1.0 procesorom.");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;// Zápis vygenerovaného HTML do okna&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const serializer = new XMLSerializer();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const resultHtml = serializer.serializeToString(resultDoc);&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;const previewFrame = document.getElementById("preview-window");&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;previewFrame.contentWindow.document.open();&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;previewFrame.contentWindow.document.write(resultHtml);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;previewFrame.contentWindow.document.close();&lt;/p&gt;&lt;p&gt;&amp;nbsp; &amp;nbsp;} catch (e) {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;console.error("Chyba pri transformácii:", e);&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;alert("Chyba: " + e.message);&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;}&lt;/p&gt;&lt;p&gt;async function ulozitDoSQL() {&lt;br&gt;&amp;nbsp; &amp;nbsp;if (!window.efXmlTextContent) return;&lt;br&gt;&amp;nbsp; &amp;nbsp;alert("Faktúra " + window.efInvoiceId + " pripravená na zápis.");&lt;br&gt;}&lt;/p&gt;&lt;p&gt;SaxonJS.transform({&lt;br&gt;&amp;nbsp; &amp;nbsp;sef: "cesta_k_vasmu_suboru.sef.json", // alebo priamo JSON objekt&lt;br&gt;&amp;nbsp; &amp;nbsp;sourceText: "&amp;lt;xml&amp;gt;...&amp;lt;/xml&amp;gt;", &amp;nbsp; &amp;nbsp; &amp;nbsp; // XML dáta na vstup&lt;br&gt;&amp;nbsp; &amp;nbsp;stylesheetParams: {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;"parametrName": "hodnota"&lt;br&gt;&amp;nbsp; &amp;nbsp;}&lt;br&gt;}, "async");&lt;/p&gt;</INFO>
+    <GUID>0E160C5F-3C01-4299-A773-EBDA5FADFFBC</GUID>
+  </QVDASHBOARD>
+  <QVQUERY>
+    <MANDANT>FERNO</MANDANT>
+    <QVQUERY>ef</QVQUERY>
+    <TITLE>ef</TITLE>
+    <STATEMENT>SELECT 
+'&lt;div class="efaktura-wrapper"&gt;
+    &lt;div id="sidebar"&gt;
+      &lt;h3&gt;Akcie&lt;/h3&gt;
+      &lt;button onclick="vybratSaxon()"&gt;1. Vybrať SaxonJS.rt.js&lt;/button&gt;
+      &lt;div id="saxon-info" style="font-size: 11px; margin-bottom: 10px; color: #888;"&gt;&lt;/div&gt;
+
+      &lt;button onclick="vybratSEF()"&gt;2. Vybrať SEF šablónu&lt;/button&gt;
+      &lt;div id="sef-info" style="font-size: 11px; margin-bottom: 10px; color: #888;"&gt;&lt;/div&gt;
+
+      &lt;button onclick="vybratXML()"&gt;3. Vybrať XML faktúru&lt;/button&gt;
+      &lt;div id="file-info" style="font-size: 11px; margin-bottom: 15px; color: #888;"&gt;&lt;/div&gt;
+
+      &lt;button id="btnPreview" onclick="zobrazitNahlad()" disabled="disabled"&gt;4. Zobraziť náhľad&lt;/button&gt;
+      &lt;button id="btnClear" onclick="vymazatNahlad()" style="margin-top: 5px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;"&gt;Vymazať náhľad&lt;/button&gt;
+      &lt;button id="btnSaveDb" onclick="ulozitDoSQL()" disabled="disabled" style="margin-top: 10px;"&gt;5. Uložiť do MS SQL&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div id="main-content"&gt;
+      &lt;h3&gt;Náhľad&lt;/h3&gt;
+      &lt;iframe id="preview-window"&gt;&lt;/iframe&gt;
+    &lt;/div&gt;
+&lt;/div&gt;' AS [Aplikácia na načítanie e-faktúry z Peppol]</STATEMENT>
+    <OPTIONS>&lt;config&gt;&lt;column name="Aplikácia na načítanie e-faktúry z Peppol"&gt;&lt;html /&gt;&lt;/column&gt;&lt;/config&gt;</OPTIONS>
+    <CSSSTYLE>/* Celkový obal aplikácie – roztiahne sa na 100% výšky okna */
+.efaktura-wrapper {
+    display: flex;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    height: calc(100vh - 120px); /* Prispôsobí sa výške obrazovky mínus horná lišta APplus */
+    min-height: 600px;
+    background-color: #f4f6f9;
+    padding: 15px;
+    box-sizing: border-box;
+    gap: 20px;
+}
+
+/* Bočný panel pre ovládanie */
+#sidebar {
+    width: 280px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+#sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 15px;
+    color: #333;
+    border-bottom: 2px solid #eaeaea;
+    padding-bottom: 8px;
+}
+
+/* Tlačidlá */
+#sidebar button {
+    padding: 10px 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#sidebar button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+#sidebar button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+#sidebar button:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Špeciálne tlačidlo na vymazanie */
+#sidebar button#btnClear {
+    background-color: #fff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    text-align: center;
+    margin-top: 5px;
+}
+
+#sidebar button#btnClear:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Hlavná časť s náhľadom */
+#main-content {
+    flex-grow: 1;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%; /* Zabezpečí plnú výšku kontajnera */
+}
+
+#main-content h3 {
+    margin: 0;
+    padding: 15px 20px;
+    font-size: 15px;
+    color: #333;
+    background: #fafbfc;
+    border-bottom: 1px solid #eaeaea;
+    flex-shrink: 0;
+}
+
+/* Iframe pre samotný HTML náhľad faktúry – dynamicky vyplní zvyšok */
+#preview-window {
+    width: 100%;
+    flex-grow: 1; /* Automaticky roztiahne iframe na celú zostávajúcu výšku */
+    border: none;
+    background: #ffffff;
+}</CSSSTYLE>
+    <INFO>&lt;p&gt;.efaktura-wrapper {&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;display: flex;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;height: 100%;&lt;br&gt;&amp;nbsp; &amp;nbsp;min-height: 600px;&lt;br&gt;}&lt;br&gt;#sidebar {&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;width: 250px;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;padding: 20px;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;background: #eee;&amp;nbsp;&lt;br&gt;}&lt;br&gt;#sidebar button {&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;padding: 10px;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;width: 100%;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;margin-bottom: 10px;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;cursor: pointer;&amp;nbsp;&lt;br&gt;}&lt;br&gt;#main-content {&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;flex: 1;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;padding: 20px;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;overflow-y: auto;&amp;nbsp;&lt;br&gt;}&lt;br&gt;#preview-window {&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;border: 1px solid #999;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;height: 80vh;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;width: 100%;&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp;background: white;&amp;nbsp;&lt;br&gt;}&lt;/p&gt;</INFO>
+    <GUID>A4DC21CB-F31C-44CD-BE22-E3DAF3F2E943</GUID>
+  </QVQUERY>
+  <QVDASHBOARDQUERY>
+    <MANDANT>FERNO</MANDANT>
+    <QVDASHBOARD>ef_2</QVDASHBOARD>
+    <QVQUERY>ef</QVQUERY>
+    <AUTOOPEN>1</AUTOOPEN>
+    <HIDETITLE>1</HIDETITLE>
+    <SHOWEXPORT>1</SHOWEXPORT>
+    <SHOWPRINT>1</SHOWPRINT>
+    <GUID>8BAE0F90-52F9-49E9-ADF5-3B616C0B0DBA</GUID>
+  </QVDASHBOARDQUERY>
+</export>
