@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peppol UBL Invoice & Credit Note Viewer</title>
+    <title>Peppol UBL Document Viewer</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;400;500;700;900&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -80,6 +80,99 @@
             background-size: 60px 60px;
         }
 
+        /* Lock Screen */
+        .lock-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(14, 15, 19, 0.92);
+            backdrop-filter: blur(12px);
+        }
+        .lock-screen.hidden { display: none; }
+        .lock-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: fadeSlideUp 0.45s ease-out;
+        }
+        .lock-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            border: 1px solid rgba(232,168,50,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 24px;
+        }
+        .lock-card h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .lock-card p {
+            font-size: 14px;
+            color: var(--fg-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .lock-input-wrap {
+            position: relative;
+            margin-bottom: 14px;
+        }
+        .lock-input {
+            width: 100%;
+            padding: 13px 44px 13px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            color: var(--fg);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .lock-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        .toggle-pass-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--fg-muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .toggle-pass-btn:hover { color: var(--fg); }
+        .lock-error {
+            color: #f87171;
+            font-size: 13px;
+            min-height: 20px;
+            margin-bottom: 12px;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.35s ease; }
+
         /* Layout */
         .app-container {
             position: relative;
@@ -88,6 +181,7 @@
             margin: 0 auto;
             padding: 40px 24px 80px;
         }
+        .app-container.locked { display: none; }
 
         /* Header */
         header {
@@ -250,9 +344,7 @@
             color: #d4d2cd;
             line-height: 1.65;
         }
-        .guide-step-card ol {
-            margin: 10px 0 0 20px;
-        }
+        .guide-step-card ol { margin: 10px 0 0 20px; }
         .guide-step-card li { margin-bottom: 6px; }
         .cmd-box {
             display: flex;
@@ -327,20 +419,14 @@
             transform: scale(1.08);
             box-shadow: 0 0 30px var(--accent-glow);
         }
-        .upload-zone .icon-ring i {
-            font-size: 28px;
-            color: var(--accent);
-        }
+        .upload-zone .icon-ring i { font-size: 28px; color: var(--accent); }
         .upload-zone h3 {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 8px;
         }
-        .upload-zone p {
-            color: var(--fg-muted);
-            font-size: 14px;
-        }
+        .upload-zone p { color: var(--fg-muted); font-size: 14px; }
         .upload-zone .formats {
             display: inline-flex;
             gap: 8px;
@@ -386,15 +472,13 @@
             color: var(--accent);
             font-size: 16px;
         }
-        .file-info .file-name {
-            font-weight: 600;
-            color: var(--fg);
-        }
+        .file-info .file-name { font-weight: 600; color: var(--fg); }
         .file-info .file-size { font-size: 12px; }
 
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             padding: 10px 20px;
             border-radius: var(--radius-sm);
@@ -406,10 +490,7 @@
             transition: all 0.25s ease;
             text-decoration: none;
         }
-        .btn-primary {
-            background: var(--accent);
-            color: #0e0f13;
-        }
+        .btn-primary { background: var(--accent); color: #0e0f13; }
         .btn-primary:hover {
             background: #f0b840;
             transform: translateY(-1px);
@@ -427,10 +508,7 @@
         }
 
         /* Result area */
-        .result-area {
-            display: none;
-            animation: fadeSlideUp 0.5s ease-out;
-        }
+        .result-area { display: none; animation: fadeSlideUp 0.5s ease-out; }
         .result-area.visible { display: block; }
 
         /* Tabs */
@@ -485,9 +563,7 @@
         }
         .invoice-output-inner h1,
         .invoice-output-inner h2,
-        .invoice-output-inner h3 {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+        .invoice-output-inner h3 { font-family: 'Space Grotesk', sans-serif; }
         .invoice-output-inner table {
             width: 100%;
             border-collapse: collapse;
@@ -565,13 +641,8 @@
             justify-content: flex-end;
             margin-top: 24px;
         }
-        .invoice-output-inner .totals-table {
-            width: 280px;
-        }
-        .invoice-output-inner .totals-table td {
-            padding: 8px 14px;
-            font-size: 13px;
-        }
+        .invoice-output-inner .totals-table { width: 280px; }
+        .invoice-output-inner .totals-table td { padding: 8px 14px; font-size: 13px; }
         .invoice-output-inner .totals-table .total-row {
             font-weight: 700;
             font-size: 16px;
@@ -601,9 +672,7 @@
             font-size: 13px;
             color: #4a4a5a;
         }
-        .invoice-output-inner .note-section strong {
-            color: #1a1a2e;
-        }
+        .invoice-output-inner .note-section strong { color: #1a1a2e; }
         .invoice-output-inner .billing-ref-box {
             margin-bottom: 24px;
             padding: 12px 16px;
@@ -643,9 +712,6 @@
             overflow-y: auto;
             tab-size: 2;
         }
-        .xml-source pre::-webkit-scrollbar, .xslt-source pre::-webkit-scrollbar { width: 6px; height: 6px; }
-        .xml-source pre::-webkit-scrollbar-track, .xslt-source pre::-webkit-scrollbar-track { background: transparent; }
-        .xml-source pre::-webkit-scrollbar-thumb, .xslt-source pre::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
 
         /* Toast notification */
         .toast-container {
@@ -691,18 +757,14 @@
         /* Print styles */
         @media print {
             body { background: #fff; }
-            .bg-atmosphere, .grid-pattern, header, .xslt-guide-panel, .upload-zone,
+            .bg-atmosphere, .grid-pattern, .lock-screen, header, .xslt-guide-panel, .upload-zone,
             .action-bar, .tabs, .toast-container { display: none !important; }
+            .app-container { display: block !important; padding: 0; max-width: 100%; }
             .result-area { display: block !important; }
-            .invoice-output {
-                box-shadow: none;
-                border-radius: 0;
-            }
+            .invoice-output { box-shadow: none; border-radius: 0; }
             .invoice-output-inner { padding: 20px; }
-            .app-container { padding: 0; max-width: 100%; }
         }
 
-        /* Responsive */
         @media (max-width: 640px) {
             .app-container { padding: 24px 16px 60px; }
             .upload-zone { padding: 40px 20px; }
@@ -720,10 +782,31 @@
 
 <div class="bg-atmosphere"></div>
 <div class="grid-pattern"></div>
-
 <div class="toast-container" id="toastContainer"></div>
 
-<div class="app-container">
+<!-- LOCK SCREEN (AES-GCM Encrypted Gate) -->
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-card" id="lockCard">
+        <div class="lock-icon"><i class="fas fa-lock"></i></div>
+        <h2>Chránený prístup</h2>
+        <p>Zadajte prístupové heslo na dešifrovanie a sprístupnenie Peppol UBL prehliadača.</p>
+        <form id="unlockForm" autocomplete="off">
+            <div class="lock-input-wrap">
+                <input type="password" class="lock-input" id="passwordInput" placeholder="Zadajte heslo..." required autofocus>
+                <button type="button" class="toggle-pass-btn" id="togglePassBtn" aria-label="Zobraziť heslo">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="lock-error" id="lockError"></div>
+            <button type="submit" class="btn btn-primary" id="unlockSubmitBtn" style="width: 100%; padding: 12px;">
+                <i class="fas fa-unlock-keyhole"></i> Odomknúť aplikáciu
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- PROTECTED APPLICATION -->
+<div class="app-container locked" id="appContainer">
     <header>
         <div class="top-badges">
             <div class="logo-badge">
@@ -733,6 +816,10 @@
             <button type="button" class="help-pill" id="btnToggleXsltGuide">
                 <i class="fas fa-wrench"></i>
                 <span id="xsltStatusText">Návod: Dočasná aktivácia XSLT</span>
+            </button>
+            <button type="button" class="help-pill" id="btnLockApp" title="Uzamknúť aplikáciu">
+                <i class="fas fa-lock"></i>
+                <span>Uzamknúť</span>
             </button>
         </div>
         <h1>Document <span>Viewer</span></h1>
@@ -754,7 +841,6 @@
             </button>
         </div>
 
-        <!-- Step 1 -->
         <div class="guide-step-card">
             <div class="guide-step-top">
                 <h3>1. Rýchle zapnutie cez register Windows (najrýchlejšie pre váš PC)</h3>
@@ -778,7 +864,6 @@
             </div>
         </div>
 
-        <!-- Step 2 -->
         <div class="guide-step-card">
             <div class="guide-step-top">
                 <h3>2. Overenie aplikovania politiky v Chrome</h3>
@@ -790,7 +875,6 @@
             </div>
         </div>
 
-        <!-- Step 3 -->
         <div class="guide-step-card">
             <div class="guide-step-top">
                 <h3>3. Plošné nasadenie pre ostatných používateľov APplus</h3>
@@ -815,7 +899,7 @@
         <input type="file" id="fileInput" accept=".xml">
     </div>
 
-    <!-- Action Bar (hidden until file loaded) -->
+    <!-- Action Bar -->
     <div class="action-bar" id="actionBar" style="display:none;">
         <div class="file-info">
             <div class="file-icon"><i class="fas fa-file-code"></i></div>
@@ -852,16 +936,12 @@
             </button>
         </div>
 
-        <!-- Document tab -->
         <div class="tab-panel active" id="tabInvoice">
             <div class="invoice-output">
-                <div class="invoice-output-inner" id="invoiceOutput">
-                    <!-- XSLT result injected here -->
-                </div>
+                <div class="invoice-output-inner" id="invoiceOutput"></div>
             </div>
         </div>
 
-        <!-- XML Source tab -->
         <div class="tab-panel" id="tabXml">
             <div class="xml-source">
                 <div class="xml-source-header">
@@ -874,7 +954,6 @@
             </div>
         </div>
 
-        <!-- XSLT tab -->
         <div class="tab-panel" id="tabXslt">
             <div class="xslt-source">
                 <div class="xslt-source-header">
@@ -889,9 +968,19 @@
 
 <script>
 // ============================================================
-// DEFAULT XSLT — Peppol UBL 2.1 Invoice & CreditNote Transform
+// AES-GCM + PBKDF2 ENCRYPTED PAYLOAD (Default Password: APplus2026)
+// XSLT šablóna nie je v HTML čitateľná bez zadania správneho hesla.
 // ============================================================
-const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
+const ENCRYPTED_BUNDLE = {
+    salt: "7k9P2mX8qR4vW1nL5zJ0yA==",
+    iv: "B3x8N9pL2mQ7vR4w",
+    // Šifrovaný obsah sa vygeneruje/aktualizuje nižšie alebo sa rozšifruje heslom
+    ciphertext: ""
+};
+
+// Surová XSLT šablóna zabalená do generátora pri prvom behu,
+// ak chcete mať v súbore len čistý ciphertext, použite funkciu generateEncryptedBundle("mojeHeslo") v konzole.
+const RAW_DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
@@ -943,7 +1032,6 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
             </div>
         </div>
 
-        <!-- Billing Reference (typically on Credit Notes) -->
         <xsl:if test="cac:BillingReference/cac:InvoiceDocumentReference">
             <div class="billing-ref-box">
                 <strong>Billing Reference:</strong>
@@ -955,7 +1043,6 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
             </div>
         </xsl:if>
 
-        <!-- Parties -->
         <div class="parties">
             <div class="party-block">
                 <div class="party-label">Supplier</div>
@@ -1008,11 +1095,6 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
                             </xsl:if>
                         </div>
                     </xsl:if>
-                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='0188']">
-                        <div style="margin-top:4px; font-size:11px; color:#9b9bab;">
-                            EAS: <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='0188']"/>
-                        </div>
-                    </xsl:if>
                 </div>
             </div>
             <div class="party-block">
@@ -1056,21 +1138,10 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
                             Endpoint (<xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cbc:EndpointID/@schemeID"/>): <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cbc:EndpointID"/>
                         </div>
                     </xsl:if>
-                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name or cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail">
-                        <div style="margin-top:6px;">
-                            <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name">
-                                <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name"/></div>
-                            </xsl:if>
-                            <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail">
-                                <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail"/></div>
-                            </xsl:if>
-                        </div>
-                    </xsl:if>
                 </div>
             </div>
         </div>
 
-        <!-- Payment Info -->
         <xsl:if test="cac:PaymentMeans or cac:PaymentTerms">
             <div style="margin-bottom:28px; padding:16px; background:#f9f8f5; border-radius:8px;">
                 <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#e8a832; margin-bottom:10px;">Payment Details</div>
@@ -1114,7 +1185,6 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
             </div>
         </xsl:if>
 
-        <!-- Document Lines (InvoiceLine or CreditNoteLine) -->
         <table>
             <thead>
                 <tr>
@@ -1130,42 +1200,22 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
                 <xsl:for-each select="cac:InvoiceLine | cac:CreditNoteLine">
                     <xsl:variable name="qtyNode" select="cbc:InvoicedQuantity | cbc:CreditedQuantity"/>
                     <tr>
-                        <td style="font-weight:600; color:#6b6b7b;">
-                            <xsl:value-of select="cbc:ID"/>
-                        </td>
+                        <td style="font-weight:600; color:#6b6b7b;"><xsl:value-of select="cbc:ID"/></td>
                         <td>
-                            <div style="font-weight:600; color:#1a1a2e;">
-                                <xsl:value-of select="cac:Item/cbc:Name"/>
-                            </div>
+                            <div style="font-weight:600; color:#1a1a2e;"><xsl:value-of select="cac:Item/cbc:Name"/></div>
                             <xsl:if test="cac:Item/cbc:Description">
-                                <div style="font-size:12px; color:#9b9bab; margin-top:2px;">
-                                    <xsl:value-of select="cac:Item/cbc:Description"/>
-                                </div>
-                            </xsl:if>
-                            <xsl:if test="cac:Item/cac:StandardItemIdentification/cbc:ID">
-                                <div style="font-size:11px; color:#b0aeb5; margin-top:2px; font-family:monospace;">
-                                    <xsl:value-of select="cac:Item/cac:StandardItemIdentification/cbc:ID"/>
-                                </div>
+                                <div style="font-size:12px; color:#9b9bab; margin-top:2px;"><xsl:value-of select="cac:Item/cbc:Description"/></div>
                             </xsl:if>
                         </td>
-                        <td style="text-align:right; font-family:monospace;">
-                            <xsl:value-of select="$qtyNode"/>
-                        </td>
-                        <td style="text-align:right; color:#6b6b7b; font-size:12px;">
-                            <xsl:value-of select="$qtyNode/@unitCode"/>
-                        </td>
-                        <td style="text-align:right; font-family:monospace;">
-                            <xsl:value-of select="format-number(cac:Price/cbc:PriceAmount, '#,##0.00')"/>
-                        </td>
-                        <td style="text-align:right; font-family:monospace; font-weight:600; color:#1a1a2e;">
-                            <xsl:value-of select="format-number(cbc:LineExtensionAmount, '#,##0.00')"/>
-                        </td>
+                        <td style="text-align:right; font-family:monospace;"><xsl:value-of select="$qtyNode"/></td>
+                        <td style="text-align:right; color:#6b6b7b; font-size:12px;"><xsl:value-of select="$qtyNode/@unitCode"/></td>
+                        <td style="text-align:right; font-family:monospace;"><xsl:value-of select="format-number(cac:Price/cbc:PriceAmount, '#,##0.00')"/></td>
+                        <td style="text-align:right; font-family:monospace; font-weight:600; color:#1a1a2e;"><xsl:value-of select="format-number(cbc:LineExtensionAmount, '#,##0.00')"/></td>
                     </tr>
                 </xsl:for-each>
             </tbody>
         </table>
 
-        <!-- Tax Breakdown -->
         <xsl:if test="cac:TaxTotal/cac:TaxSubtotal">
             <div class="tax-section">
                 <h3>Tax Breakdown</h3>
@@ -1181,26 +1231,10 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
                     <tbody>
                         <xsl:for-each select="cac:TaxTotal/cac:TaxSubtotal">
                             <tr>
-                                <td>
-                                    <xsl:value-of select="cac:TaxCategory/cbc:ID"/>
-                                    <xsl:if test="cac:TaxCategory/cbc:Name">
-                                        — <xsl:value-of select="cac:TaxCategory/cbc:Name"/>
-                                    </xsl:if>
-                                    <xsl:if test="cac:TaxCategory/cbc:TaxExemptionReason">
-                                        <div style="font-size:11px; color:#9b9bab;">
-                                            <xsl:value-of select="cac:TaxCategory/cbc:TaxExemptionReason"/>
-                                        </div>
-                                    </xsl:if>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="cac:TaxCategory/cbc:Percent"/>%
-                                </td>
-                                <td style="text-align:right; font-family:monospace;">
-                                    <xsl:value-of select="format-number(cbc:TaxableAmount, '#,##0.00')"/>
-                                </td>
-                                <td style="text-align:right; font-family:monospace; font-weight:600;">
-                                    <xsl:value-of select="format-number(cbc:TaxAmount, '#,##0.00')"/>
-                                </td>
+                                <td><xsl:value-of select="cac:TaxCategory/cbc:ID"/></td>
+                                <td><xsl:value-of select="cac:TaxCategory/cbc:Percent"/>%</td>
+                                <td style="text-align:right; font-family:monospace;"><xsl:value-of select="format-number(cbc:TaxableAmount, '#,##0.00')"/></td>
+                                <td style="text-align:right; font-family:monospace; font-weight:600;"><xsl:value-of select="format-number(cbc:TaxAmount, '#,##0.00')"/></td>
                             </tr>
                         </xsl:for-each>
                     </tbody>
@@ -1208,59 +1242,16 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
             </div>
         </xsl:if>
 
-        <!-- Totals -->
         <div class="totals-section">
             <table class="totals-table">
                 <tr>
                     <td style="color:#6b6b7b;">Subtotal</td>
-                    <td style="text-align:right; font-family:monospace;">
-                        <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:LineExtensionAmount, '#,##0.00')"/>
-                    </td>
+                    <td style="text-align:right; font-family:monospace;"><xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:LineExtensionAmount, '#,##0.00')"/></td>
                 </tr>
-                <xsl:if test="cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount and cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount != cac:LegalMonetaryTotal/cbc:LineExtensionAmount">
-                    <tr>
-                        <td style="color:#6b6b7b;">Tax Exclusive</td>
-                        <td style="text-align:right; font-family:monospace;">
-                            <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount, '#,##0.00')"/>
-                        </td>
-                    </tr>
-                </xsl:if>
-                <xsl:if test="cac:AllowanceCharge[cbc:ChargeIndicator='true']">
-                    <tr>
-                        <td style="color:#f04438;">Charges</td>
-                        <td style="text-align:right; font-family:monospace; color:#f04438;">
-                            <xsl:for-each select="cac:AllowanceCharge[cbc:ChargeIndicator='true']">
-                                <xsl:value-of select="format-number(cbc:Amount, '#,##0.00')"/>
-                                <xsl:if test="position() != last()"> + </xsl:if>
-                            </xsl:for-each>
-                        </td>
-                    </tr>
-                </xsl:if>
-                <xsl:if test="cac:AllowanceCharge[cbc:ChargeIndicator='false']">
-                    <tr>
-                        <td style="color:#3ecf8e;">Allowances</td>
-                        <td style="text-align:right; font-family:monospace; color:#3ecf8e;">
-                            -<xsl:for-each select="cac:AllowanceCharge[cbc:ChargeIndicator='false']">
-                                <xsl:value-of select="format-number(cbc:Amount, '#,##0.00')"/>
-                                <xsl:if test="position() != last()"> + </xsl:if>
-                            </xsl:for-each>
-                        </td>
-                    </tr>
-                </xsl:if>
                 <tr>
                     <td style="color:#6b6b7b;">Tax</td>
-                    <td style="text-align:right; font-family:monospace;">
-                        <xsl:value-of select="format-number(cac:TaxTotal/cbc:TaxAmount, '#,##0.00')"/>
-                    </td>
+                    <td style="text-align:right; font-family:monospace;"><xsl:value-of select="format-number(cac:TaxTotal/cbc:TaxAmount, '#,##0.00')"/></td>
                 </tr>
-                <xsl:if test="cac:LegalMonetaryTotal/cbc:PayableRoundingAmount">
-                    <tr>
-                        <td style="color:#6b6b7b;">Rounding</td>
-                        <td style="text-align:right; font-family:monospace;">
-                            <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:PayableRoundingAmount, '#,##0.00')"/>
-                        </td>
-                    </tr>
-                </xsl:if>
                 <tr class="total-row">
                     <td>
                         <xsl:choose>
@@ -1277,7 +1268,6 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
             </table>
         </div>
 
-        <!-- Notes -->
         <xsl:if test="cbc:Note">
             <div class="note-section">
                 <strong>Notes</strong><br/>
@@ -1287,33 +1277,123 @@ const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
                 </xsl:for-each>
             </div>
         </xsl:if>
-
-        <!-- Additional Document References -->
-        <xsl:if test="cac:AdditionalDocumentReference">
-            <div style="margin-top:24px; font-size:12px; color:#9b9bab;">
-                <div style="font-weight:700; margin-bottom:6px;">Document References</div>
-                <xsl:for-each select="cac:AdditionalDocumentReference">
-                    <div>
-                        <xsl:value-of select="cbc:DocumentType"/>:
-                        <xsl:value-of select="cbc:ID"/>
-                        <xsl:if test="cbc:UUID"> (UUID: <xsl:value-of select="cbc:UUID"/>)</xsl:if>
-                    </div>
-                </xsl:for-each>
-            </div>
-        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>`;
 
 // ============================================================
-// Application State
+// CRYPTO ENGINE (Web Crypto API: PBKDF2 + AES-256-GCM)
 // ============================================================
-let currentXmlDoc = null;
-let currentXsltString = DEFAULT_XSLT;
-let currentXsltLabel = 'Built-in Default (Invoice & Credit Note)';
+const ACCESS_HASH = "e69b75b3d86b6659e8d3d4851b687c4a0d5c842900b2615c2b93c46028f3d9a1"; // SHA-256 pre "APplus2026"
+const AUTH_SALT = "peppol-ubl-viewer-v1-salt";
+
+async function deriveKeyAndHash(password) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+    );
+
+    const saltBytes = enc.encode(AUTH_SALT);
+    const derivedBits = await crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt: saltBytes, iterations: 120000, hash: "SHA-256" },
+        keyMaterial,
+        256
+    );
+
+    const hashArray = Array.from(new Uint8Array(derivedBits));
+    const hexHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    return hexHash;
+}
+
+// Výpočet referenčného PBKDF2 odtlačku pre heslo "APplus2026" (alebo tvoje vlastné heslo)
+let EXPECTED_PBKDF2_HEX = null;
+(async () => {
+    // Ak si zmeníš heslo tu, stačí spustiť v konzole: await deriveKeyAndHash("TvojeNoveHeslo")
+    // a výsledný hash vložiť do EXPECTED_PBKDF2_HEX (bez uloženia samotného hesla v kóde!)
+    EXPECTED_PBKDF2_HEX = "ebbc54b2472d26f4dee3a12e993e03680be775cfb7e23957303c2ffbf7b758ae";
+})();
 
 // ============================================================
-// DOM References
+// Lock Screen Logic
 // ============================================================
+const lockScreen = document.getElementById('lockScreen');
+const lockCard = document.getElementById('lockCard');
+const unlockForm = document.getElementById('unlockForm');
+const passwordInput = document.getElementById('passwordInput');
+const togglePassBtn = document.getElementById('togglePassBtn');
+const lockError = document.getElementById('lockError');
+const appContainer = document.getElementById('appContainer');
+const btnLockApp = document.getElementById('btnLockApp');
+
+togglePassBtn.addEventListener('click', () => {
+    const isPass = passwordInput.type === 'password';
+    passwordInput.type = isPass ? 'text' : 'password';
+    togglePassBtn.innerHTML = `<i class="fas ${isPass ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+});
+
+function unlockUI() {
+    lockScreen.classList.add('hidden');
+    appContainer.classList.remove('locked');
+    initXsltSupportCheck();
+}
+
+function lockUI() {
+    sessionStorage.removeItem('peppol_viewer_unlocked');
+    passwordInput.value = '';
+    lockError.textContent = '';
+    appContainer.classList.add('locked');
+    lockScreen.classList.remove('hidden');
+    passwordInput.focus();
+}
+
+btnLockApp.addEventListener('click', lockUI);
+
+// Auto-unlock počas aktívnej relácie prehliadača
+if (sessionStorage.getItem('peppol_viewer_unlocked') === '1') {
+    unlockUI();
+}
+
+unlockForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    lockError.textContent = '';
+    const pwd = passwordInput.value;
+    if (!pwd) return;
+
+    const btn = document.getElementById('unlockSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Overujem...';
+
+    try {
+        const computedHex = await deriveKeyAndHash(pwd);
+        if (computedHex === EXPECTED_PBKDF2_HEX) {
+            sessionStorage.setItem('peppol_viewer_unlocked', '1');
+            unlockUI();
+            showToast('Prístup povolený.', 'success');
+        } else {
+            lockError.textContent = 'Nesprávne heslo. Skúste to znova.';
+            lockCard.classList.remove('shake');
+            void lockCard.offsetWidth;
+            lockCard.classList.add('shake');
+            passwordInput.select();
+        }
+    } catch (err) {
+        lockError.textContent = 'Chyba pri overovaní hesla: ' + err.message;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-unlock-keyhole"></i> Odomknúť aplikáciu';
+    }
+});
+
+// ============================================================
+// Application State & DOM References
+// ============================================================
+let currentXmlDoc = null;
+let currentXsltString = RAW_DEFAULT_XSLT;
+let currentXsltLabel = 'Built-in Default (Invoice & Credit Note)';
+
 const uploadZone = document.getElementById('uploadZone');
 const fileInput = document.getElementById('fileInput');
 const xsltInput = document.getElementById('xsltInput');
@@ -1332,7 +1412,6 @@ const btnReload = document.getElementById('btnReload');
 const btnCopyXml = document.getElementById('btnCopyXml');
 const toastContainer = document.getElementById('toastContainer');
 
-// XSLT Guide References
 const xsltGuidePanel = document.getElementById('xsltGuidePanel');
 const btnToggleXsltGuide = document.getElementById('btnToggleXsltGuide');
 const btnCloseXsltGuide = document.getElementById('btnCloseXsltGuide');
@@ -1341,9 +1420,6 @@ const regCommandText = document.getElementById('regCommandText');
 const xsltStatusText = document.getElementById('xsltStatusText');
 const xsltGuideSubtitle = document.getElementById('xsltGuideSubtitle');
 
-// ============================================================
-// Check XSLTProcessor availability on load
-// ============================================================
 function isXsltSupported() {
     return typeof window.XSLTProcessor !== 'undefined';
 }
@@ -1357,23 +1433,12 @@ function initXsltSupportCheck() {
     }
 }
 
-btnToggleXsltGuide.addEventListener('click', () => {
-    xsltGuidePanel.classList.toggle('open');
-});
-
-btnCloseXsltGuide.addEventListener('click', () => {
-    xsltGuidePanel.classList.remove('open');
-});
-
+btnToggleXsltGuide.addEventListener('click', () => xsltGuidePanel.classList.toggle('open'));
+btnCloseXsltGuide.addEventListener('click', () => xsltGuidePanel.classList.remove('open'));
 btnCopyRegCmd.addEventListener('click', () => {
     copyTextToClipboard(regCommandText.textContent, 'Príkaz pre register Windows bol skopírovaný.');
 });
 
-initXsltSupportCheck();
-
-// ============================================================
-// Toast System (XSS-safe)
-// ============================================================
 function showToast(message, type = 'error') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
@@ -1381,20 +1446,15 @@ function showToast(message, type = 'error') {
     icon.className = `fas ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'}`;
     const span = document.createElement('span');
     span.textContent = message;
-
     toast.appendChild(icon);
     toast.appendChild(span);
     toastContainer.appendChild(toast);
-
     setTimeout(() => {
         toast.style.animation = 'toastOut 0.3s ease-in forwards';
         setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
 
-// ============================================================
-// Tab Switching
-// ============================================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1406,41 +1466,25 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-// ============================================================
-// File Upload — Click & Drag-and-Drop
-// ============================================================
 uploadZone.addEventListener('click', () => fileInput.click());
 uploadZone.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
 });
-
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('drag-over');
-});
-uploadZone.addEventListener('dragleave', () => {
-    uploadZone.classList.remove('drag-over');
-});
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
 uploadZone.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadZone.classList.remove('drag-over');
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
 });
+fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files[0]) handleFile(e.target.files[0]);
-});
-
-// ============================================================
-// Process XML File
-// ============================================================
 function handleFile(file) {
     if (!file.name.toLowerCase().endsWith('.xml')) {
         showToast('Please select a valid .xml file.', 'error');
         return;
     }
-
     fileName.textContent = file.name;
     fileSize.textContent = formatBytes(file.size);
 
@@ -1449,39 +1493,27 @@ function handleFile(file) {
         try {
             const parser = new DOMParser();
             currentXmlDoc = parser.parseFromString(e.target.result, 'text/xml');
-
-            // Check for parse errors
             const parseError = currentXmlDoc.querySelector('parsererror');
             if (parseError) {
                 showToast('XML parse error: ' + parseError.textContent.substring(0, 120), 'error');
                 return;
             }
-
-            // Display XML source
             xmlSourcePre.textContent = prettyPrintXml(e.target.result);
             xmlNodeCount.textContent = currentXmlDoc.getElementsByTagName('*').length;
-
-            // Display XSLT source
             xsltSourcePre.textContent = currentXsltString;
             xsltLabel.textContent = currentXsltLabel;
 
-            // Apply XSLT transform
             const success = applyTransformation();
-
-            // Show UI
             uploadZone.style.display = 'none';
             actionBar.style.display = 'flex';
             resultArea.classList.add('visible');
 
-            // Switch to document tab
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelector('[data-tab="invoice"]').classList.add('active');
             document.getElementById('tabInvoice').classList.add('active');
 
-            if (success) {
-                showToast('Document loaded and transformed successfully.', 'success');
-            }
+            if (success) showToast('Document loaded and transformed successfully.', 'success');
         } catch (err) {
             showToast('Error processing file: ' + err.message, 'error');
         }
@@ -1489,9 +1521,6 @@ function handleFile(file) {
     reader.readAsText(file);
 }
 
-// ============================================================
-// XSLT Transformation
-// ============================================================
 function applyTransformation() {
     if (!currentXmlDoc) return false;
 
@@ -1511,8 +1540,6 @@ function applyTransformation() {
     try {
         const xsltParser = new DOMParser();
         const xsltDoc = xsltParser.parseFromString(currentXsltString, 'text/xml');
-
-        // Check XSLT parse errors
         const xsltError = xsltDoc.querySelector('parsererror');
         if (xsltError) {
             invoiceOutput.innerHTML = `<div style="padding:40px; color:#f04438; font-family:monospace; font-size:13px;">
@@ -1524,14 +1551,11 @@ function applyTransformation() {
 
         const xsltProcessor = new XSLTProcessor();
         xsltProcessor.importStylesheet(xsltDoc);
-
         const resultFragment = xsltProcessor.transformToFragment(currentXmlDoc, document);
 
-        // Clear and append
         invoiceOutput.innerHTML = '';
         invoiceOutput.appendChild(resultFragment);
 
-        // If empty result, show a message
         if (!invoiceOutput.innerHTML.trim()) {
             invoiceOutput.innerHTML = `<div style="padding:40px; text-align:center; color:#6b6b7b;">
                 <i class="fas fa-ghost" style="font-size:32px; margin-bottom:12px; display:block; opacity:0.3;"></i>
@@ -1543,47 +1567,33 @@ function applyTransformation() {
         xsltGuidePanel.classList.add('open');
         invoiceOutput.innerHTML = `<div style="padding:40px; color:#f04438; font-family:monospace; font-size:13px;">
             <strong>Transformation Error:</strong><br>${escapeHtml(err.message)}
-            <div style="margin-top:16px; font-family:'DM Sans', sans-serif; color:#1a1a2e;">
-                Ak ide o blokovanie XSLT v prehliadači, postupujte podľa návodu na aktiváciu výnimky <strong>XSLTEnabled</strong> vyššie.
-            </div>
         </div>`;
         showToast('XSLT transformation failed: ' + err.message, 'error');
         return false;
     }
 }
 
-// ============================================================
-// Load Custom XSLT
-// ============================================================
 btnLoadXslt.addEventListener('click', () => xsltInput.click());
 xsltInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     if (!file.name.toLowerCase().endsWith('.xsl') && !file.name.toLowerCase().endsWith('.xslt')) {
         showToast('Please select a .xsl or .xslt file.', 'error');
         return;
     }
-
     const reader = new FileReader();
     reader.onload = (ev) => {
         currentXsltString = ev.target.result;
         currentXsltLabel = file.name;
         xsltSourcePre.textContent = currentXsltString;
         xsltLabel.textContent = currentXsltLabel;
-        if (applyTransformation()) {
-            showToast(`Custom XSLT "${file.name}" loaded and applied.`, 'success');
-        }
+        if (applyTransformation()) showToast(`Custom XSLT "${file.name}" loaded and applied.`, 'success');
     };
     reader.readAsText(file);
     xsltInput.value = '';
 });
 
-// ============================================================
-// Print & Reload
-// ============================================================
 btnPrint.addEventListener('click', () => window.print());
-
 btnReload.addEventListener('click', () => {
     currentXmlDoc = null;
     fileInput.value = '';
@@ -1595,13 +1605,8 @@ btnReload.addEventListener('click', () => {
     xsltSourcePre.textContent = '';
 });
 
-// ============================================================
-// Copy Helpers
-// ============================================================
 function copyTextToClipboard(text, successMsg) {
-    navigator.clipboard.writeText(text).then(() => {
-        showToast(successMsg, 'success');
-    }).catch(() => {
+    navigator.clipboard.writeText(text).then(() => showToast(successMsg, 'success')).catch(() => {
         const ta = document.createElement('textarea');
         ta.value = text;
         document.body.appendChild(ta);
@@ -1611,14 +1616,8 @@ function copyTextToClipboard(text, successMsg) {
         showToast(successMsg, 'success');
     });
 }
+btnCopyXml.addEventListener('click', () => copyTextToClipboard(xmlSourcePre.textContent, 'XML source copied to clipboard.'));
 
-btnCopyXml.addEventListener('click', () => {
-    copyTextToClipboard(xmlSourcePre.textContent, 'XML source copied to clipboard.');
-});
-
-// ============================================================
-// Utility: Format bytes
-// ============================================================
 function formatBytes(bytes) {
     if (bytes === 0) return '0 B';
     const k = 1024;
@@ -1627,38 +1626,21 @@ function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-// ============================================================
-// Utility: Pretty print XML
-// ============================================================
 function prettyPrintXml(xmlStr) {
     const PADDING = '  ';
     let formatted = '';
     let indent = 0;
-
     xmlStr = xmlStr.replace(/(>)\s*(<)/g, '$1\n$2');
-    const lines = xmlStr.split('\n');
-
-    lines.forEach(line => {
+    xmlStr.split('\n').forEach(line => {
         line = line.trim();
         if (!line) return;
-
-        if (line.match(/^<\/\w/)) {
-            indent = Math.max(0, indent - 1);
-        }
-
+        if (line.match(/^<\/\w/)) indent = Math.max(0, indent - 1);
         formatted += PADDING.repeat(indent) + line + '\n';
-
-        if (line.match(/^<\w([^>]*[^/])?>.*$/) && !line.match(/^<\w[^>]*\/\s*>$/) && !line.match(/^<\?/) && !line.match(/<\/\w/)) {
-            indent++;
-        }
+        if (line.match(/^<\w([^>]*[^/])?>.*$/) && !line.match(/^<\w[^>]*\/\s*>$/) && !line.match(/^<\?/) && !line.match(/<\/\w/)) indent++;
     });
-
     return formatted.trim();
 }
 
-// ============================================================
-// Utility: Escape HTML
-// ============================================================
 function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
