@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peppol UBL Invoice & Credit Note Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;400;500;700;900&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0e0f13;
+            --bg-elevated: #16171d;
+            --bg-card: #1c1d25;
+            --fg: #e8e6e1;
+            --fg-muted: #8a8890;
+            --accent: #e8a832;
+            --accent-dim: rgba(232, 168, 50, 0.12);
+            --accent-glow: rgba(232, 168, 50, 0.25);
+            --success: #3ecf8e;
+            --error: #f04438;
+            --border: #2a2b34;
+            --border-light: #35363f;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background atmosphere */
+        .bg-atmosphere {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-atmosphere::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(232,168,50,0.06) 0%, transparent 70%);
+            animation: floatBlob 20s ease-in-out infinite;
+        }
+        .bg-atmosphere::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -15%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(62,207,142,0.04) 0%, transparent 70%);
+            animation: floatBlob 25s ease-in-out infinite reverse;
+        }
+        @keyframes floatBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5%, -8%) scale(1.05); }
+            66% { transform: translate(-3%, 5%) scale(0.95); }
+        }
+
+        .grid-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Layout */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 36px;
+            animation: fadeSlideDown 0.6s ease-out;
+        }
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .top-badges {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(232,168,50,0.2);
+            border-radius: 100px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+        .logo-badge i { font-size: 14px; }
+
+        .help-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 100px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--fg-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .help-pill:hover {
+            border-color: var(--accent);
+            color: var(--fg);
+            background: var(--accent-dim);
+        }
+        .help-pill.warning-active {
+            background: rgba(240, 68, 56, 0.15);
+            border-color: rgba(240, 68, 56, 0.45);
+            color: #f87171;
+        }
+
+        header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 14px;
+        }
+        header h1 span { color: var(--accent); }
+        header p {
+            color: var(--fg-muted);
+            font-size: 16px;
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* XSLT Guide Banner / Panel */
+        .xslt-guide-panel {
+            display: none;
+            background: var(--bg-elevated);
+            border: 1px solid rgba(232, 168, 50, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 32px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+            animation: fadeSlideDown 0.35s ease-out;
+        }
+        .xslt-guide-panel.open { display: block; }
+        .xslt-guide-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .xslt-guide-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .xslt-guide-title .warn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(240, 68, 56, 0.15);
+            border: 1px solid rgba(240, 68, 56, 0.3);
+            color: #f87171;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .xslt-guide-title h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--fg);
+        }
+        .xslt-guide-title p {
+            font-size: 13px;
+            color: var(--fg-muted);
+            margin-top: 2px;
+        }
+        .guide-step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .guide-step-card:last-child { margin-bottom: 0; }
+        .guide-step-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .guide-step-top h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .time-badge {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(232,168,50,0.25);
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .guide-step-card p, .guide-step-card li {
+            font-size: 14px;
+            color: #d4d2cd;
+            line-height: 1.65;
+        }
+        .guide-step-card ol {
+            margin: 10px 0 0 20px;
+        }
+        .guide-step-card li { margin-bottom: 6px; }
+        .cmd-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #0b0c0f;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin: 10px 0;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            color: #3ecf8e;
+            overflow-x: auto;
+        }
+        .cmd-box code { white-space: nowrap; }
+        .inline-code {
+            background: rgba(255,255,255,0.07);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            color: #f3c66f;
+        }
+        .verification-note {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(62, 207, 142, 0.08);
+            border-left: 3px solid var(--success);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-size: 13px;
+            color: #c8f3df;
+        }
+
+        /* Upload zone */
+        .upload-zone {
+            position: relative;
+            border: 2px dashed var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 56px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            background: var(--bg-elevated);
+            margin-bottom: 32px;
+            animation: fadeSlideUp 0.6s ease-out 0.15s both;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .upload-zone:hover, .upload-zone.drag-over {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px var(--accent-glow);
+        }
+        .upload-zone .icon-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            border: 1px solid rgba(232,168,50,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+        .upload-zone:hover .icon-ring {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        .upload-zone .icon-ring i {
+            font-size: 28px;
+            color: var(--accent);
+        }
+        .upload-zone h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .upload-zone p {
+            color: var(--fg-muted);
+            font-size: 14px;
+        }
+        .upload-zone .formats {
+            display: inline-flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .upload-zone .formats span {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--fg-muted);
+            letter-spacing: 0.3px;
+        }
+        #fileInput { display: none; }
+
+        /* Action bar */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            animation: fadeSlideUp 0.6s ease-out 0.3s both;
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--fg-muted);
+        }
+        .file-info .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 16px;
+        }
+        .file-info .file-name {
+            font-weight: 600;
+            color: var(--fg);
+        }
+        .file-info .file-size { font-size: 12px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #0e0f13;
+        }
+        .btn-primary:hover {
+            background: #f0b840;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--fg-muted);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--fg-muted);
+            color: var(--fg);
+            background: var(--bg-elevated);
+        }
+
+        /* Result area */
+        .result-area {
+            display: none;
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+        .result-area.visible { display: block; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--fg-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .tab-btn:hover { color: var(--fg); }
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Invoice rendered output */
+        .invoice-output {
+            background: #ffffff;
+            color: #1a1a2e;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+        }
+        .invoice-output-inner {
+            padding: 40px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .invoice-output-inner h1,
+        .invoice-output-inner h2,
+        .invoice-output-inner h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .invoice-output-inner table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        .invoice-output-inner th {
+            background: #f4f3ef;
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b6b7b;
+            border-bottom: 2px solid #e8e6e1;
+        }
+        .invoice-output-inner td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #eeecea;
+            font-size: 13px;
+        }
+        .invoice-output-inner tr:last-child td { border-bottom: none; }
+        .invoice-output-inner .inv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid #1a1a2e;
+        }
+        .invoice-output-inner .inv-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a2e;
+            letter-spacing: -0.5px;
+        }
+        .invoice-output-inner .inv-meta {
+            text-align: right;
+            font-size: 13px;
+            color: #6b6b7b;
+        }
+        .invoice-output-inner .inv-meta strong {
+            color: #1a1a2e;
+            display: block;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+        .invoice-output-inner .parties {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+        .invoice-output-inner .party-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e8a832;
+            margin-bottom: 8px;
+        }
+        .invoice-output-inner .party-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .invoice-output-inner .party-detail {
+            font-size: 13px;
+            color: #6b6b7b;
+            line-height: 1.7;
+        }
+        .invoice-output-inner .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        .invoice-output-inner .totals-table {
+            width: 280px;
+        }
+        .invoice-output-inner .totals-table td {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+        .invoice-output-inner .totals-table .total-row {
+            font-weight: 700;
+            font-size: 16px;
+            border-top: 2px solid #1a1a2e;
+            color: #1a1a2e;
+        }
+        .invoice-output-inner .tax-section {
+            margin: 24px 0;
+            padding: 16px;
+            background: #f9f8f5;
+            border-radius: 8px;
+        }
+        .invoice-output-inner .tax-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b6b7b;
+            margin-bottom: 10px;
+        }
+        .invoice-output-inner .note-section {
+            margin-top: 24px;
+            padding: 16px;
+            border-left: 3px solid #e8a832;
+            background: #fdf9f0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: #4a4a5a;
+        }
+        .invoice-output-inner .note-section strong {
+            color: #1a1a2e;
+        }
+        .invoice-output-inner .billing-ref-box {
+            margin-bottom: 24px;
+            padding: 12px 16px;
+            background: #f4f3ef;
+            border-left: 3px solid #1a1a2e;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: #1a1a2e;
+        }
+
+        /* XML & XSLT source view */
+        .xml-source, .xslt-source {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        .xml-source-header, .xslt-source-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--fg-muted);
+            font-weight: 500;
+        }
+        .xml-source pre, .xslt-source pre {
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: #c4c1ba;
+            max-height: 600px;
+            overflow-y: auto;
+            tab-size: 2;
+        }
+        .xml-source pre::-webkit-scrollbar, .xslt-source pre::-webkit-scrollbar { width: 6px; height: 6px; }
+        .xml-source pre::-webkit-scrollbar-track, .xslt-source pre::-webkit-scrollbar-track { background: transparent; }
+        .xml-source pre::-webkit-scrollbar-thumb, .xslt-source pre::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+        /* Toast notification */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.35s ease-out;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            min-width: 280px;
+        }
+        .toast.error {
+            background: #2a1215;
+            border: 1px solid rgba(240,68,56,0.3);
+            color: #f87171;
+        }
+        .toast.success {
+            background: #0f2920;
+            border: 1px solid rgba(62,207,142,0.3);
+            color: #3ecf8e;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(30px); }
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: #fff; }
+            .bg-atmosphere, .grid-pattern, header, .xslt-guide-panel, .upload-zone,
+            .action-bar, .tabs, .toast-container { display: none !important; }
+            .result-area { display: block !important; }
+            .invoice-output {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .invoice-output-inner { padding: 20px; }
+            .app-container { padding: 0; max-width: 100%; }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .app-container { padding: 24px 16px 60px; }
+            .upload-zone { padding: 40px 20px; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .invoice-output-inner { padding: 24px 20px; }
+            .invoice-output-inner .parties { grid-template-columns: 1fr; gap: 20px; }
+            .invoice-output-inner .inv-header { flex-direction: column; gap: 16px; }
+            .invoice-output-inner .inv-meta { text-align: left; }
+            .tabs { overflow-x: auto; }
+            .xslt-guide-panel { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="grid-pattern"></div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-container">
+    <header>
+        <div class="top-badges">
+            <div class="logo-badge">
+                <i class="fas fa-file-invoice"></i>
+                PEPPOL UBL 2.1
+            </div>
+            <button type="button" class="help-pill" id="btnToggleXsltGuide">
+                <i class="fas fa-wrench"></i>
+                <span id="xsltStatusText">Návod: Dočasná aktivácia XSLT</span>
+            </button>
+        </div>
+        <h1>Document <span>Viewer</span></h1>
+        <p>Load a Peppol UBL XML Invoice or Credit Note and transform it into a clean, readable format using XSLT processing directly in your browser.</p>
+    </header>
+
+    <!-- XSLT Activation Guide Panel -->
+    <section class="xslt-guide-panel" id="xsltGuidePanel" aria-label="Návod na dočasnú aktiváciu XSLT procesora">
+        <div class="xslt-guide-header">
+            <div class="xslt-guide-title">
+                <div class="warn-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                <div>
+                    <h2>Dočasná aktivácia XSLT procesora v prehliadači</h2>
+                    <p id="xsltGuideSubtitle">Ak sa doklad nevykreslí kvôli blokovaniu XSLT v Chrome / Edge, použite nasledujúci postup.</p>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline" id="btnCloseXsltGuide" style="padding: 6px 12px; font-size: 12px;">
+                <i class="fas fa-xmark"></i> Zavrieť
+            </button>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="guide-step-card">
+            <div class="guide-step-top">
+                <h3>1. Rýchle zapnutie cez register Windows (najrýchlejšie pre váš PC)</h3>
+                <span class="time-badge"><i class="far fa-clock"></i> 2 min.</span>
+            </div>
+            <p>Keďže ste na lokálnej stanici a potrebujete hneď pracovať, zapnite dočasnú firemnú výnimku <span class="inline-code">XSLTEnabled</span> priamo v registroch Windows:</p>
+            <ol>
+                <li>Otvorte <strong>Príkazový riadok (CMD)</strong> ako <strong>Správca (Administrator)</strong>.</li>
+                <li>Spustite tento príkaz:
+                    <div class="cmd-box">
+                        <code id="regCommandText">reg add "HKLM\SOFTWARE\Policies\Google\Chrome" /v XSLTEnabled /t REG_DWORD /d 1 /f</code>
+                        <button type="button" class="btn btn-outline" id="btnCopyRegCmd" style="padding: 5px 10px; font-size: 12px; flex-shrink: 0;">
+                            <i class="fas fa-copy"></i> Kopírovať
+                        </button>
+                    </div>
+                </li>
+                <li>Úplne reštartujte Chrome (vrátane procesov na pozadí, alebo v adresnom riadku zadajte <span class="inline-code">chrome://restart</span>).</li>
+            </ol>
+            <div class="verification-note">
+                <strong>Verification:</strong> V DevTools (<span class="inline-code">F12</span>) na záložke <span class="inline-code">AufstueliposTab.aspx</span> zmizne chyba <span class="inline-code">TypeError: Cannot read properties of undefined (reading 'firstElementChild')</span> a položky sa normálne vykreslia.
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="guide-step-card">
+            <div class="guide-step-top">
+                <h3>2. Overenie aplikovania politiky v Chrome</h3>
+                <span class="time-badge"><i class="far fa-clock"></i> 1 min.</span>
+            </div>
+            <p>Otvorte v Chrome novú kartu a zadajte adresu <span class="inline-code">chrome://policy</span>. Kliknite na <strong>Znova načítať pravidlá (Reload policies)</strong>.</p>
+            <div class="verification-note">
+                <strong>Verification:</strong> V tabuľke sa zobrazí položka <span class="inline-code">XSLTEnabled</span> s hodnotou <span class="inline-code">true</span> a stavom <span class="inline-code">OK</span>.
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="guide-step-card">
+            <div class="guide-step-top">
+                <h3>3. Plošné nasadenie pre ostatných používateľov APplus</h3>
+                <span class="time-badge"><i class="fas fa-network-wired"></i> GPO / Edge</span>
+            </div>
+            <p>Ak majú používatelia doménové počítače, nasaďte tú istú politiku cez <strong>Group Policy (GPO)</strong> do uzla <span class="inline-code">Policies\Google\Chrome</span> (a preventívne aj do <span class="inline-code">Policies\Microsoft\Edge</span>, pretože MS Edge 158 urobí presne to isté). Táto výnimka bude fungovať až do <strong>augusta 2027 (Chrome 176)</strong>, dovtedy bude nutné nasadiť oficiálny hotfix/upgrade od Asseca.</p>
+        </div>
+    </section>
+
+    <!-- Upload Zone -->
+    <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload XML document file">
+        <div class="icon-ring">
+            <i class="fas fa-cloud-arrow-up"></i>
+        </div>
+        <h3>Drop your XML Invoice or Credit Note here</h3>
+        <p>or click to browse files from your device</p>
+        <div class="formats">
+            <span>.xml</span>
+            <span>Invoice &amp; CreditNote</span>
+            <span>Peppol BIS 3</span>
+        </div>
+        <input type="file" id="fileInput" accept=".xml">
+    </div>
+
+    <!-- Action Bar (hidden until file loaded) -->
+    <div class="action-bar" id="actionBar" style="display:none;">
+        <div class="file-info">
+            <div class="file-icon"><i class="fas fa-file-code"></i></div>
+            <div>
+                <div class="file-name" id="fileName">—</div>
+                <div class="file-size" id="fileSize">—</div>
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-outline" id="btnLoadXslt">
+                <i class="fas fa-file-import"></i> Load Custom XSLT
+            </button>
+            <button class="btn btn-outline" id="btnPrint">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <button class="btn btn-primary" id="btnReload">
+                <i class="fas fa-rotate"></i> New File
+            </button>
+            <input type="file" id="xsltInput" accept=".xsl,.xslt" style="display:none;">
+        </div>
+    </div>
+
+    <!-- Result Area -->
+    <div class="result-area" id="resultArea">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="invoice">
+                <i class="fas fa-file-invoice"></i> Document
+            </button>
+            <button class="tab-btn" data-tab="xml">
+                <i class="fas fa-code"></i> XML Source
+            </button>
+            <button class="tab-btn" data-tab="xslt">
+                <i class="fas fa-wand-magic-sparkles"></i> XSLT Used
+            </button>
+        </div>
+
+        <!-- Document tab -->
+        <div class="tab-panel active" id="tabInvoice">
+            <div class="invoice-output">
+                <div class="invoice-output-inner" id="invoiceOutput">
+                    <!-- XSLT result injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- XML Source tab -->
+        <div class="tab-panel" id="tabXml">
+            <div class="xml-source">
+                <div class="xml-source-header">
+                    <span><i class="fas fa-file-code" style="margin-right:8px;"></i>Raw XML — <span id="xmlNodeCount">0</span> nodes</span>
+                    <button class="btn btn-outline" style="padding:6px 14px; font-size:12px;" id="btnCopyXml">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <pre id="xmlSourcePre"></pre>
+            </div>
+        </div>
+
+        <!-- XSLT tab -->
+        <div class="tab-panel" id="tabXslt">
+            <div class="xslt-source">
+                <div class="xslt-source-header">
+                    <span><i class="fas fa-wand-magic-sparkles" style="margin-right:8px;"></i>Active XSLT Transformation</span>
+                    <span id="xsltLabel" style="font-size:11px; opacity:0.6;">Built-in Default</span>
+                </div>
+                <pre id="xsltSourcePre"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// DEFAULT XSLT — Peppol UBL 2.1 Invoice & CreditNote Transform
+// ============================================================
+const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:inv="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+    xmlns:cn="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2"
+    exclude-result-prefixes="cbc cac inv cn">
+
+    <xsl:output method="html" encoding="UTF-8" indent="yes"/>
+
+    <xsl:template match="/inv:Invoice | /cn:CreditNote">
+        <xsl:variable name="typeCode" select="cbc:InvoiceTypeCode | cbc:CreditNoteTypeCode | cbc:DocumentTypeCode"/>
+
+        <div class="inv-header">
+            <div>
+                <div class="inv-title">
+                    <xsl:choose>
+                        <xsl:when test="self::cn:CreditNote or $typeCode='381'">Credit Note</xsl:when>
+                        <xsl:when test="$typeCode='380'">Invoice</xsl:when>
+                        <xsl:when test="$typeCode='384'">Corrected Invoice</xsl:when>
+                        <xsl:when test="$typeCode='389'">Self-Billed Invoice</xsl:when>
+                        <xsl:otherwise>Invoice</xsl:otherwise>
+                    </xsl:choose>
+                </div>
+                <xsl:if test="cbc:CustomizationID">
+                    <div style="font-size:11px; color:#9b9bab; margin-top:4px;">
+                        <xsl:value-of select="cbc:CustomizationID"/>
+                    </div>
+                </xsl:if>
+            </div>
+            <div class="inv-meta">
+                <strong><xsl:value-of select="cbc:ID"/></strong>
+                <div>Issued: <xsl:value-of select="cbc:IssueDate"/></div>
+                <xsl:if test="cbc:DueDate">
+                    <div>Due: <xsl:value-of select="cbc:DueDate"/></div>
+                </xsl:if>
+                <xsl:if test="$typeCode">
+                    <div>Type: <xsl:value-of select="$typeCode"/></div>
+                </xsl:if>
+                <xsl:if test="cbc:BuyerReference">
+                    <div>Buyer Ref: <xsl:value-of select="cbc:BuyerReference"/></div>
+                </xsl:if>
+                <xsl:if test="cbc:DocumentCurrencyCode">
+                    <div>Currency: <xsl:value-of select="cbc:DocumentCurrencyCode"/></div>
+                </xsl:if>
+                <xsl:if test="cbc:TaxCurrencyCode and cbc:TaxCurrencyCode != cbc:DocumentCurrencyCode">
+                    <div>Tax Currency: <xsl:value-of select="cbc:TaxCurrencyCode"/></div>
+                </xsl:if>
+            </div>
+        </div>
+
+        <!-- Billing Reference (typically on Credit Notes) -->
+        <xsl:if test="cac:BillingReference/cac:InvoiceDocumentReference">
+            <div class="billing-ref-box">
+                <strong>Billing Reference:</strong>
+                <xsl:for-each select="cac:BillingReference/cac:InvoiceDocumentReference">
+                    Invoice <strong><xsl:value-of select="cbc:ID"/></strong>
+                    <xsl:if test="cbc:IssueDate"> (Issued: <xsl:value-of select="cbc:IssueDate"/>)</xsl:if>
+                    <xsl:if test="position() != last()">, </xsl:if>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <!-- Parties -->
+        <div class="parties">
+            <div class="party-block">
+                <div class="party-label">Supplier</div>
+                <div class="party-name">
+                    <xsl:choose>
+                        <xsl:when test="cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName">
+                            <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </div>
+                <div class="party-detail">
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName">
+                        <div><xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName">
+                        <div><xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:PostalZone">
+                        <div><xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:PostalZone"/>
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CityName"/>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode">
+                        <div><xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID">
+                        <div style="margin-top:6px; font-weight:600; color:#1a1a2e;">
+                            VAT: <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID"/>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID">
+                        <div>ID: <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cbc:EndpointID">
+                        <div style="margin-top:4px; font-size:11px; color:#9b9bab;">
+                            Endpoint (<xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cbc:EndpointID/@schemeID"/>): <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cbc:EndpointID"/>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Name or cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail">
+                        <div style="margin-top:6px;">
+                            <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Name">
+                                <div><xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Name"/></div>
+                            </xsl:if>
+                            <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail">
+                                <div><xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail"/></div>
+                            </xsl:if>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='0188']">
+                        <div style="margin-top:4px; font-size:11px; color:#9b9bab;">
+                            EAS: <xsl:value-of select="cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='0188']"/>
+                        </div>
+                    </xsl:if>
+                </div>
+            </div>
+            <div class="party-block">
+                <div class="party-label">Customer</div>
+                <div class="party-name">
+                    <xsl:choose>
+                        <xsl:when test="cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName">
+                            <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </div>
+                <div class="party-detail">
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:StreetName">
+                        <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:StreetName"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName">
+                        <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:PostalZone">
+                        <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:PostalZone"/>
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CityName"/>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode">
+                        <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID">
+                        <div style="margin-top:6px; font-weight:600; color:#1a1a2e;">
+                            VAT: <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID"/>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID">
+                        <div>ID: <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID"/></div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cbc:EndpointID">
+                        <div style="margin-top:4px; font-size:11px; color:#9b9bab;">
+                            Endpoint (<xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cbc:EndpointID/@schemeID"/>): <xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cbc:EndpointID"/>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name or cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail">
+                        <div style="margin-top:6px;">
+                            <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name">
+                                <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name"/></div>
+                            </xsl:if>
+                            <xsl:if test="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail">
+                                <div><xsl:value-of select="cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail"/></div>
+                            </xsl:if>
+                        </div>
+                    </xsl:if>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <xsl:if test="cac:PaymentMeans or cac:PaymentTerms">
+            <div style="margin-bottom:28px; padding:16px; background:#f9f8f5; border-radius:8px;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#e8a832; margin-bottom:10px;">Payment Details</div>
+                <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode">
+                    <div style="font-size:13px; color:#4a4a5a;">
+                        Means: <strong><xsl:value-of select="cac:PaymentMeans/cbc:PaymentMeansCode"/></strong>
+                        <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode='30'"> (Credit Transfer)</xsl:if>
+                        <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode='42'"> (Payment to Bank Account)</xsl:if>
+                        <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode='48'"> (Bank Card)</xsl:if>
+                        <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode='49'"> (Direct Debit)</xsl:if>
+                        <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode='58'"> (SEPA Credit Transfer)</xsl:if>
+                        <xsl:if test="cac:PaymentMeans/cbc:PaymentMeansCode='59'"> (SEPA Direct Debit)</xsl:if>
+                    </div>
+                </xsl:if>
+                <xsl:if test="cac:PaymentMeans/cbc:PaymentID">
+                    <div style="font-size:13px; color:#4a4a5a; margin-top:4px;">
+                        Payment ID / VS: <strong style="font-family:monospace;"><xsl:value-of select="cac:PaymentMeans/cbc:PaymentID"/></strong>
+                    </div>
+                </xsl:if>
+                <xsl:variable name="ibanVal" select="cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:IBAN | cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID"/>
+                <xsl:if test="$ibanVal">
+                    <div style="font-size:13px; color:#4a4a5a; margin-top:4px;">
+                        IBAN: <strong style="font-family:monospace; letter-spacing:0.5px;"><xsl:value-of select="$ibanVal"/></strong>
+                    </div>
+                </xsl:if>
+                <xsl:if test="cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:AccountName">
+                    <div style="font-size:13px; color:#4a4a5a; margin-top:2px;">
+                        Account: <xsl:value-of select="cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:AccountName"/>
+                    </div>
+                </xsl:if>
+                <xsl:if test="cac:PaymentMeans/cac:PayeeFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID">
+                    <div style="font-size:13px; color:#4a4a5a; margin-top:2px;">
+                        BIC: <strong style="font-family:monospace;"><xsl:value-of select="cac:PaymentMeans/cac:PayeeFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID"/></strong>
+                    </div>
+                </xsl:if>
+                <xsl:if test="cac:PaymentTerms/cbc:Note">
+                    <div style="font-size:13px; color:#4a4a5a; margin-top:6px;">
+                        Terms: <xsl:value-of select="cac:PaymentTerms/cbc:Note"/>
+                    </div>
+                </xsl:if>
+            </div>
+        </xsl:if>
+
+        <!-- Document Lines (InvoiceLine or CreditNoteLine) -->
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:50px;">#</th>
+                    <th>Description</th>
+                    <th style="width:70px; text-align:right;">Qty</th>
+                    <th style="width:80px; text-align:right;">Unit</th>
+                    <th style="width:110px; text-align:right;">Unit Price</th>
+                    <th style="width:110px; text-align:right;">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xsl:for-each select="cac:InvoiceLine | cac:CreditNoteLine">
+                    <xsl:variable name="qtyNode" select="cbc:InvoicedQuantity | cbc:CreditedQuantity"/>
+                    <tr>
+                        <td style="font-weight:600; color:#6b6b7b;">
+                            <xsl:value-of select="cbc:ID"/>
+                        </td>
+                        <td>
+                            <div style="font-weight:600; color:#1a1a2e;">
+                                <xsl:value-of select="cac:Item/cbc:Name"/>
+                            </div>
+                            <xsl:if test="cac:Item/cbc:Description">
+                                <div style="font-size:12px; color:#9b9bab; margin-top:2px;">
+                                    <xsl:value-of select="cac:Item/cbc:Description"/>
+                                </div>
+                            </xsl:if>
+                            <xsl:if test="cac:Item/cac:StandardItemIdentification/cbc:ID">
+                                <div style="font-size:11px; color:#b0aeb5; margin-top:2px; font-family:monospace;">
+                                    <xsl:value-of select="cac:Item/cac:StandardItemIdentification/cbc:ID"/>
+                                </div>
+                            </xsl:if>
+                        </td>
+                        <td style="text-align:right; font-family:monospace;">
+                            <xsl:value-of select="$qtyNode"/>
+                        </td>
+                        <td style="text-align:right; color:#6b6b7b; font-size:12px;">
+                            <xsl:value-of select="$qtyNode/@unitCode"/>
+                        </td>
+                        <td style="text-align:right; font-family:monospace;">
+                            <xsl:value-of select="format-number(cac:Price/cbc:PriceAmount, '#,##0.00')"/>
+                        </td>
+                        <td style="text-align:right; font-family:monospace; font-weight:600; color:#1a1a2e;">
+                            <xsl:value-of select="format-number(cbc:LineExtensionAmount, '#,##0.00')"/>
+                        </td>
+                    </tr>
+                </xsl:for-each>
+            </tbody>
+        </table>
+
+        <!-- Tax Breakdown -->
+        <xsl:if test="cac:TaxTotal/cac:TaxSubtotal">
+            <div class="tax-section">
+                <h3>Tax Breakdown</h3>
+                <table style="margin:0;">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Rate</th>
+                            <th style="text-align:right;">Taxable</th>
+                            <th style="text-align:right;">Tax Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <xsl:for-each select="cac:TaxTotal/cac:TaxSubtotal">
+                            <tr>
+                                <td>
+                                    <xsl:value-of select="cac:TaxCategory/cbc:ID"/>
+                                    <xsl:if test="cac:TaxCategory/cbc:Name">
+                                        — <xsl:value-of select="cac:TaxCategory/cbc:Name"/>
+                                    </xsl:if>
+                                    <xsl:if test="cac:TaxCategory/cbc:TaxExemptionReason">
+                                        <div style="font-size:11px; color:#9b9bab;">
+                                            <xsl:value-of select="cac:TaxCategory/cbc:TaxExemptionReason"/>
+                                        </div>
+                                    </xsl:if>
+                                </td>
+                                <td>
+                                    <xsl:value-of select="cac:TaxCategory/cbc:Percent"/>%
+                                </td>
+                                <td style="text-align:right; font-family:monospace;">
+                                    <xsl:value-of select="format-number(cbc:TaxableAmount, '#,##0.00')"/>
+                                </td>
+                                <td style="text-align:right; font-family:monospace; font-weight:600;">
+                                    <xsl:value-of select="format-number(cbc:TaxAmount, '#,##0.00')"/>
+                                </td>
+                            </tr>
+                        </xsl:for-each>
+                    </tbody>
+                </table>
+            </div>
+        </xsl:if>
+
+        <!-- Totals -->
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td style="color:#6b6b7b;">Subtotal</td>
+                    <td style="text-align:right; font-family:monospace;">
+                        <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:LineExtensionAmount, '#,##0.00')"/>
+                    </td>
+                </tr>
+                <xsl:if test="cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount and cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount != cac:LegalMonetaryTotal/cbc:LineExtensionAmount">
+                    <tr>
+                        <td style="color:#6b6b7b;">Tax Exclusive</td>
+                        <td style="text-align:right; font-family:monospace;">
+                            <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount, '#,##0.00')"/>
+                        </td>
+                    </tr>
+                </xsl:if>
+                <xsl:if test="cac:AllowanceCharge[cbc:ChargeIndicator='true']">
+                    <tr>
+                        <td style="color:#f04438;">Charges</td>
+                        <td style="text-align:right; font-family:monospace; color:#f04438;">
+                            <xsl:for-each select="cac:AllowanceCharge[cbc:ChargeIndicator='true']">
+                                <xsl:value-of select="format-number(cbc:Amount, '#,##0.00')"/>
+                                <xsl:if test="position() != last()"> + </xsl:if>
+                            </xsl:for-each>
+                        </td>
+                    </tr>
+                </xsl:if>
+                <xsl:if test="cac:AllowanceCharge[cbc:ChargeIndicator='false']">
+                    <tr>
+                        <td style="color:#3ecf8e;">Allowances</td>
+                        <td style="text-align:right; font-family:monospace; color:#3ecf8e;">
+                            -<xsl:for-each select="cac:AllowanceCharge[cbc:ChargeIndicator='false']">
+                                <xsl:value-of select="format-number(cbc:Amount, '#,##0.00')"/>
+                                <xsl:if test="position() != last()"> + </xsl:if>
+                            </xsl:for-each>
+                        </td>
+                    </tr>
+                </xsl:if>
+                <tr>
+                    <td style="color:#6b6b7b;">Tax</td>
+                    <td style="text-align:right; font-family:monospace;">
+                        <xsl:value-of select="format-number(cac:TaxTotal/cbc:TaxAmount, '#,##0.00')"/>
+                    </td>
+                </tr>
+                <xsl:if test="cac:LegalMonetaryTotal/cbc:PayableRoundingAmount">
+                    <tr>
+                        <td style="color:#6b6b7b;">Rounding</td>
+                        <td style="text-align:right; font-family:monospace;">
+                            <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:PayableRoundingAmount, '#,##0.00')"/>
+                        </td>
+                    </tr>
+                </xsl:if>
+                <tr class="total-row">
+                    <td>
+                        <xsl:choose>
+                            <xsl:when test="self::cn:CreditNote">Credited Amount</xsl:when>
+                            <xsl:otherwise>Payable Amount</xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                    <td style="text-align:right; font-family:monospace; font-size:18px;">
+                        <xsl:value-of select="format-number(cac:LegalMonetaryTotal/cbc:PayableAmount, '#,##0.00')"/>
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="cbc:DocumentCurrencyCode"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Notes -->
+        <xsl:if test="cbc:Note">
+            <div class="note-section">
+                <strong>Notes</strong><br/>
+                <xsl:for-each select="cbc:Note">
+                    <xsl:value-of select="."/>
+                    <xsl:if test="position() != last()"><br/></xsl:if>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <!-- Additional Document References -->
+        <xsl:if test="cac:AdditionalDocumentReference">
+            <div style="margin-top:24px; font-size:12px; color:#9b9bab;">
+                <div style="font-weight:700; margin-bottom:6px;">Document References</div>
+                <xsl:for-each select="cac:AdditionalDocumentReference">
+                    <div>
+                        <xsl:value-of select="cbc:DocumentType"/>:
+                        <xsl:value-of select="cbc:ID"/>
+                        <xsl:if test="cbc:UUID"> (UUID: <xsl:value-of select="cbc:UUID"/>)</xsl:if>
+                    </div>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+    </xsl:template>
+</xsl:stylesheet>`;
+
+// ============================================================
+// Application State
+// ============================================================
+let currentXmlDoc = null;
+let currentXsltString = DEFAULT_XSLT;
+let currentXsltLabel = 'Built-in Default (Invoice & Credit Note)';
+
+// ============================================================
+// DOM References
+// ============================================================
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const xsltInput = document.getElementById('xsltInput');
+const actionBar = document.getElementById('actionBar');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const resultArea = document.getElementById('resultArea');
+const invoiceOutput = document.getElementById('invoiceOutput');
+const xmlSourcePre = document.getElementById('xmlSourcePre');
+const xmlNodeCount = document.getElementById('xmlNodeCount');
+const xsltSourcePre = document.getElementById('xsltSourcePre');
+const xsltLabel = document.getElementById('xsltLabel');
+const btnLoadXslt = document.getElementById('btnLoadXslt');
+const btnPrint = document.getElementById('btnPrint');
+const btnReload = document.getElementById('btnReload');
+const btnCopyXml = document.getElementById('btnCopyXml');
+const toastContainer = document.getElementById('toastContainer');
+
+// XSLT Guide References
+const xsltGuidePanel = document.getElementById('xsltGuidePanel');
+const btnToggleXsltGuide = document.getElementById('btnToggleXsltGuide');
+const btnCloseXsltGuide = document.getElementById('btnCloseXsltGuide');
+const btnCopyRegCmd = document.getElementById('btnCopyRegCmd');
+const regCommandText = document.getElementById('regCommandText');
+const xsltStatusText = document.getElementById('xsltStatusText');
+const xsltGuideSubtitle = document.getElementById('xsltGuideSubtitle');
+
+// ============================================================
+// Check XSLTProcessor availability on load
+// ============================================================
+function isXsltSupported() {
+    return typeof window.XSLTProcessor !== 'undefined';
+}
+
+function initXsltSupportCheck() {
+    if (!isXsltSupported()) {
+        btnToggleXsltGuide.classList.add('warning-active');
+        xsltStatusText.textContent = 'XSLT vypnuté — Zobraziť návod na zapnutie';
+        xsltGuideSubtitle.textContent = 'Váš prehliadač momentálne blokuje XSLTProcessor. Postupujte podľa návodu nižšie pre jeho dočasnú aktiváciu.';
+        xsltGuidePanel.classList.add('open');
+    }
+}
+
+btnToggleXsltGuide.addEventListener('click', () => {
+    xsltGuidePanel.classList.toggle('open');
+});
+
+btnCloseXsltGuide.addEventListener('click', () => {
+    xsltGuidePanel.classList.remove('open');
+});
+
+btnCopyRegCmd.addEventListener('click', () => {
+    copyTextToClipboard(regCommandText.textContent, 'Príkaz pre register Windows bol skopírovaný.');
+});
+
+initXsltSupportCheck();
+
+// ============================================================
+// Toast System (XSS-safe)
+// ============================================================
+function showToast(message, type = 'error') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = document.createElement('i');
+    icon.className = `fas ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'}`;
+    const span = document.createElement('span');
+    span.textContent = message;
+
+    toast.appendChild(icon);
+    toast.appendChild(span);
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s ease-in forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// ============================================================
+// Tab Switching
+// ============================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab' + capitalize(btn.dataset.tab)).classList.add('active');
+    });
+});
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ============================================================
+// File Upload — Click & Drag-and-Drop
+// ============================================================
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+});
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+});
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+// ============================================================
+// Process XML File
+// ============================================================
+function handleFile(file) {
+    if (!file.name.toLowerCase().endsWith('.xml')) {
+        showToast('Please select a valid .xml file.', 'error');
+        return;
+    }
+
+    fileName.textContent = file.name;
+    fileSize.textContent = formatBytes(file.size);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const parser = new DOMParser();
+            currentXmlDoc = parser.parseFromString(e.target.result, 'text/xml');
+
+            // Check for parse errors
+            const parseError = currentXmlDoc.querySelector('parsererror');
+            if (parseError) {
+                showToast('XML parse error: ' + parseError.textContent.substring(0, 120), 'error');
+                return;
+            }
+
+            // Display XML source
+            xmlSourcePre.textContent = prettyPrintXml(e.target.result);
+            xmlNodeCount.textContent = currentXmlDoc.getElementsByTagName('*').length;
+
+            // Display XSLT source
+            xsltSourcePre.textContent = currentXsltString;
+            xsltLabel.textContent = currentXsltLabel;
+
+            // Apply XSLT transform
+            const success = applyTransformation();
+
+            // Show UI
+            uploadZone.style.display = 'none';
+            actionBar.style.display = 'flex';
+            resultArea.classList.add('visible');
+
+            // Switch to document tab
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector('[data-tab="invoice"]').classList.add('active');
+            document.getElementById('tabInvoice').classList.add('active');
+
+            if (success) {
+                showToast('Document loaded and transformed successfully.', 'success');
+            }
+        } catch (err) {
+            showToast('Error processing file: ' + err.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ============================================================
+// XSLT Transformation
+// ============================================================
+function applyTransformation() {
+    if (!currentXmlDoc) return false;
+
+    if (!isXsltSupported()) {
+        xsltGuidePanel.classList.add('open');
+        invoiceOutput.innerHTML = `<div style="padding:40px; color:#b42318; background:#fef3f2; border-radius:8px;">
+            <h3 style="margin-bottom:8px; font-size:18px;"><i class="fas fa-triangle-exclamation"></i> XSLT procesor nie je v prehliadači dostupný</h3>
+            <p style="font-size:14px; margin-bottom:14px;">Prehliadač zablokoval natívny <code>XSLTProcessor</code> (Chrome 158+ / Edge 158+). Pre zobrazenie dokladu postupujte podľa návodu na dočasnú aktiváciu zobrazeného nad týmto oknom.</p>
+            <button type="button" onclick="document.getElementById('xsltGuidePanel').classList.add('open'); window.scrollTo({top:0, behavior:'smooth'});" style="padding:8px 16px; background:#1a1a2e; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600;">
+                Zobraziť návod na aktiváciu
+            </button>
+        </div>`;
+        showToast('XSLTProcessor je vypnutý. Pozrite si návod na aktiváciu.', 'error');
+        return false;
+    }
+
+    try {
+        const xsltParser = new DOMParser();
+        const xsltDoc = xsltParser.parseFromString(currentXsltString, 'text/xml');
+
+        // Check XSLT parse errors
+        const xsltError = xsltDoc.querySelector('parsererror');
+        if (xsltError) {
+            invoiceOutput.innerHTML = `<div style="padding:40px; color:#f04438; font-family:monospace; font-size:13px;">
+                <strong>XSLT Parse Error:</strong><br>${escapeHtml(xsltError.textContent)}
+            </div>`;
+            showToast('XSLT contains syntax errors.', 'error');
+            return false;
+        }
+
+        const xsltProcessor = new XSLTProcessor();
+        xsltProcessor.importStylesheet(xsltDoc);
+
+        const resultFragment = xsltProcessor.transformToFragment(currentXmlDoc, document);
+
+        // Clear and append
+        invoiceOutput.innerHTML = '';
+        invoiceOutput.appendChild(resultFragment);
+
+        // If empty result, show a message
+        if (!invoiceOutput.innerHTML.trim()) {
+            invoiceOutput.innerHTML = `<div style="padding:40px; text-align:center; color:#6b6b7b;">
+                <i class="fas fa-ghost" style="font-size:32px; margin-bottom:12px; display:block; opacity:0.3;"></i>
+                The XSLT produced no output for this document.
+            </div>`;
+        }
+        return true;
+    } catch (err) {
+        xsltGuidePanel.classList.add('open');
+        invoiceOutput.innerHTML = `<div style="padding:40px; color:#f04438; font-family:monospace; font-size:13px;">
+            <strong>Transformation Error:</strong><br>${escapeHtml(err.message)}
+            <div style="margin-top:16px; font-family:'DM Sans', sans-serif; color:#1a1a2e;">
+                Ak ide o blokovanie XSLT v prehliadači, postupujte podľa návodu na aktiváciu výnimky <strong>XSLTEnabled</strong> vyššie.
+            </div>
+        </div>`;
+        showToast('XSLT transformation failed: ' + err.message, 'error');
+        return false;
+    }
+}
+
+// ============================================================
+// Load Custom XSLT
+// ============================================================
+btnLoadXslt.addEventListener('click', () => xsltInput.click());
+xsltInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.xsl') && !file.name.toLowerCase().endsWith('.xslt')) {
+        showToast('Please select a .xsl or .xslt file.', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        currentXsltString = ev.target.result;
+        currentXsltLabel = file.name;
+        xsltSourcePre.textContent = currentXsltString;
+        xsltLabel.textContent = currentXsltLabel;
+        if (applyTransformation()) {
+            showToast(`Custom XSLT "${file.name}" loaded and applied.`, 'success');
+        }
+    };
+    reader.readAsText(file);
+    xsltInput.value = '';
+});
+
+// ============================================================
+// Print & Reload
+// ============================================================
+btnPrint.addEventListener('click', () => window.print());
+
+btnReload.addEventListener('click', () => {
+    currentXmlDoc = null;
+    fileInput.value = '';
+    uploadZone.style.display = '';
+    actionBar.style.display = 'none';
+    resultArea.classList.remove('visible');
+    invoiceOutput.innerHTML = '';
+    xmlSourcePre.textContent = '';
+    xsltSourcePre.textContent = '';
+});
+
+// ============================================================
+// Copy Helpers
+// ============================================================
+function copyTextToClipboard(text, successMsg) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(successMsg, 'success');
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast(successMsg, 'success');
+    });
+}
+
+btnCopyXml.addEventListener('click', () => {
+    copyTextToClipboard(xmlSourcePre.textContent, 'XML source copied to clipboard.');
+});
+
+// ============================================================
+// Utility: Format bytes
+// ============================================================
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// ============================================================
+// Utility: Pretty print XML
+// ============================================================
+function prettyPrintXml(xmlStr) {
+    const PADDING = '  ';
+    let formatted = '';
+    let indent = 0;
+
+    xmlStr = xmlStr.replace(/(>)\s*(<)/g, '$1\n$2');
+    const lines = xmlStr.split('\n');
+
+    lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+
+        if (line.match(/^<\/\w/)) {
+            indent = Math.max(0, indent - 1);
+        }
+
+        formatted += PADDING.repeat(indent) + line + '\n';
+
+        if (line.match(/^<\w([^>]*[^/])?>.*$/) && !line.match(/^<\w[^>]*\/\s*>$/) && !line.match(/^<\?/) && !line.match(/<\/\w/)) {
+            indent++;
+        }
+    });
+
+    return formatted.trim();
+}
+
+// ============================================================
+// Utility: Escape HTML
+// ============================================================
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+</script>
+</body>
+</html>
