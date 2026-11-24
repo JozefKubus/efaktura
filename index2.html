@@ -35,7 +35,6 @@
             overflow-x: hidden;
         }
 
-        /* Background atmosphere */
         .bg-atmosphere {
             position: fixed;
             inset: 0;
@@ -89,7 +88,7 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: rgba(14, 15, 19, 0.92);
+            background: rgba(14, 15, 19, 0.94);
             backdrop-filter: blur(12px);
         }
         .lock-screen.hidden { display: none; }
@@ -754,7 +753,6 @@
             to { opacity: 0; transform: translateX(30px); }
         }
 
-        /* Print styles */
         @media print {
             body { background: #fff; }
             .bg-atmosphere, .grid-pattern, .lock-screen, header, .xslt-guide-panel, .upload-zone,
@@ -784,12 +782,11 @@
 <div class="grid-pattern"></div>
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- LOCK SCREEN (AES-GCM Encrypted Gate) -->
 <div class="lock-screen" id="lockScreen">
     <div class="lock-card" id="lockCard">
         <div class="lock-icon"><i class="fas fa-lock"></i></div>
         <h2>Chránený prístup</h2>
-        <p>Zadajte prístupové heslo na dešifrovanie a sprístupnenie Peppol UBL prehliadača.</p>
+        <p>Zadajte prístupové heslo na odomknutie Peppol UBL prehliadača.</p>
         <form id="unlockForm" autocomplete="off">
             <div class="lock-input-wrap">
                 <input type="password" class="lock-input" id="passwordInput" placeholder="Zadajte heslo..." required autofocus>
@@ -805,7 +802,6 @@
     </div>
 </div>
 
-<!-- PROTECTED APPLICATION -->
 <div class="app-container locked" id="appContainer">
     <header>
         <div class="top-badges">
@@ -826,7 +822,6 @@
         <p>Load a Peppol UBL XML Invoice or Credit Note and transform it into a clean, readable format using XSLT processing directly in your browser.</p>
     </header>
 
-    <!-- XSLT Activation Guide Panel -->
     <section class="xslt-guide-panel" id="xsltGuidePanel" aria-label="Návod na dočasnú aktiváciu XSLT procesora">
         <div class="xslt-guide-header">
             <div class="xslt-guide-title">
@@ -884,7 +879,6 @@
         </div>
     </section>
 
-    <!-- Upload Zone -->
     <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Upload XML document file">
         <div class="icon-ring">
             <i class="fas fa-cloud-arrow-up"></i>
@@ -899,7 +893,6 @@
         <input type="file" id="fileInput" accept=".xml">
     </div>
 
-    <!-- Action Bar -->
     <div class="action-bar" id="actionBar" style="display:none;">
         <div class="file-info">
             <div class="file-icon"><i class="fas fa-file-code"></i></div>
@@ -922,7 +915,6 @@
         </div>
     </div>
 
-    <!-- Result Area -->
     <div class="result-area" id="resultArea">
         <div class="tabs">
             <button class="tab-btn active" data-tab="invoice">
@@ -967,20 +959,29 @@
 </div>
 
 <script>
-// ============================================================
-// AES-GCM + PBKDF2 ENCRYPTED PAYLOAD (Default Password: APplus2026)
-// XSLT šablóna nie je v HTML čitateľná bez zadania správneho hesla.
-// ============================================================
-const ENCRYPTED_BUNDLE = {
-    salt: "7k9P2mX8qR4vW1nL5zJ0yA==",
-    iv: "B3x8N9pL2mQ7vR4w",
-    // Šifrovaný obsah sa vygeneruje/aktualizuje nižšie alebo sa rozšifruje heslom
-    ciphertext: ""
-};
+const ACCESS_TOKEN = "ebbc54b2472d26f4dee3a12e993e03680be775cfb7e23957303c2ffbf7b758ae";
+const AUTH_SALT = "peppol-ubl-viewer-v1-salt";
 
-// Surová XSLT šablóna zabalená do generátora pri prvom behu,
-// ak chcete mať v súbore len čistý ciphertext, použite funkciu generateEncryptedBundle("mojeHeslo") v konzole.
-const RAW_DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
+async function verifyToken(input) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(input),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits"]
+    );
+    const derivedBits = await crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt: enc.encode(AUTH_SALT), iterations: 120000, hash: "SHA-256" },
+        keyMaterial,
+        256
+    );
+    return Array.from(new Uint8Array(derivedBits))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+const DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
@@ -1280,45 +1281,6 @@ const RAW_DEFAULT_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
     </xsl:template>
 </xsl:stylesheet>`;
 
-// ============================================================
-// CRYPTO ENGINE (Web Crypto API: PBKDF2 + AES-256-GCM)
-// ============================================================
-const ACCESS_HASH = "e69b75b3d86b6659e8d3d4851b687c4a0d5c842900b2615c2b93c46028f3d9a1"; // SHA-256 pre "APplus2026"
-const AUTH_SALT = "peppol-ubl-viewer-v1-salt";
-
-async function deriveKeyAndHash(password) {
-    const enc = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
-        "raw",
-        enc.encode(password),
-        { name: "PBKDF2" },
-        false,
-        ["deriveBits", "deriveKey"]
-    );
-
-    const saltBytes = enc.encode(AUTH_SALT);
-    const derivedBits = await crypto.subtle.deriveBits(
-        { name: "PBKDF2", salt: saltBytes, iterations: 120000, hash: "SHA-256" },
-        keyMaterial,
-        256
-    );
-
-    const hashArray = Array.from(new Uint8Array(derivedBits));
-    const hexHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-    return hexHash;
-}
-
-// Výpočet referenčného PBKDF2 odtlačku pre heslo "APplus2026" (alebo tvoje vlastné heslo)
-let EXPECTED_PBKDF2_HEX = null;
-(async () => {
-    // Ak si zmeníš heslo tu, stačí spustiť v konzole: await deriveKeyAndHash("TvojeNoveHeslo")
-    // a výsledný hash vložiť do EXPECTED_PBKDF2_HEX (bez uloženia samotného hesla v kóde!)
-    EXPECTED_PBKDF2_HEX = "ebbc54b2472d26f4dee3a12e993e03680be775cfb7e23957303c2ffbf7b758ae";
-})();
-
-// ============================================================
-// Lock Screen Logic
-// ============================================================
 const lockScreen = document.getElementById('lockScreen');
 const lockCard = document.getElementById('lockCard');
 const unlockForm = document.getElementById('unlockForm');
@@ -1351,8 +1313,7 @@ function lockUI() {
 
 btnLockApp.addEventListener('click', lockUI);
 
-// Auto-unlock počas aktívnej relácie prehliadača
-if (sessionStorage.getItem('peppol_viewer_unlocked') === '1') {
+if (sessionStorage.getItem('peppol_viewer_unlocked') === ACCESS_TOKEN) {
     unlockUI();
 }
 
@@ -1367,9 +1328,9 @@ unlockForm.addEventListener('submit', async (e) => {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Overujem...';
 
     try {
-        const computedHex = await deriveKeyAndHash(pwd);
-        if (computedHex === EXPECTED_PBKDF2_HEX) {
-            sessionStorage.setItem('peppol_viewer_unlocked', '1');
+        const computedHex = await verifyToken(pwd);
+        if (computedHex === ACCESS_TOKEN) {
+            sessionStorage.setItem('peppol_viewer_unlocked', ACCESS_TOKEN);
             unlockUI();
             showToast('Prístup povolený.', 'success');
         } else {
@@ -1380,18 +1341,15 @@ unlockForm.addEventListener('submit', async (e) => {
             passwordInput.select();
         }
     } catch (err) {
-        lockError.textContent = 'Chyba pri overovaní hesla: ' + err.message;
+        lockError.textContent = 'Chyba pri overovaní: ' + err.message;
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-unlock-keyhole"></i> Odomknúť aplikáciu';
     }
 });
 
-// ============================================================
-// Application State & DOM References
-// ============================================================
 let currentXmlDoc = null;
-let currentXsltString = RAW_DEFAULT_XSLT;
+let currentXsltString = DEFAULT_XSLT;
 let currentXsltLabel = 'Built-in Default (Invoice & Credit Note)';
 
 const uploadZone = document.getElementById('uploadZone');
